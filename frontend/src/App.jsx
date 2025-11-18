@@ -11,9 +11,15 @@ import AddStudent from './layout/AddStudent.jsx';
 import SendMessage from './components/SendMessage.jsx';
 import EventManagement from './layout/EventManagement';
 import EventDetail from './layout/EventDetail.jsx';
+import MealPlan from "./layout/MealPlan.jsx";
+import StudentHealth from "./layout/StudentHealth.jsx";
+import DailyMeal from "./layout/DailyMeal.jsx";
+import { AppProvider } from './context/AppContext';
+import Reports from './layout/Report.jsx';
 
 function App() {
     return (
+        <AppProvider>
         <Router>
             <Routes>
                 <Route path="/" element={<LoginPage />} />
@@ -30,8 +36,13 @@ function App() {
                 <Route path="/event-management" element={<EventManagement />} />
                 <Route path="/event/:date" element={<EventDetail />} />
 
+                <Route path="/meal-plan" element={<MealPlan/>} />
+                <Route path="/student-health" element={<StudentHealth/>} />
+                <Route path="/daily-meal" element={<DailyMeal/>} />
+                <Route path="/reports" element={<Reports/>} />
             </Routes>
         </Router>
+        </AppProvider>
     );
 }
 
