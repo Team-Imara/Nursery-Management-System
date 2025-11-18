@@ -37,7 +37,7 @@ const Sidebar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const mainNavItems = [
-        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', to: '/' },
+        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', to: '/dashboard' },
         { icon: <GraduationCap size={20} />, label: 'Teachers', to: '/teachers' },
         { icon: <Users size={20} />, label: 'Students', to: '/students' },
         { icon: <BookOpen size={20} />, label: 'Classes', to: '/classes' },
