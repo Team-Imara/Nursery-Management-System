@@ -226,21 +226,24 @@ const Teachers = () => {
 
     return (
         <div className="flex w-full min-h-screen bg-gray-50">
-            <Sidebar />
+      {/* Sidebar */}
+      <Sidebar />
 
-            <div className="flex-1 ml-64 p-8">
-                <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-                    <div className="flex items-center justify-end">
-                        <HeaderRightSection
-                            notificationCount={3}
-                            imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-                            name="Admin"
-                            onNotificationClick={() => alert('Notifications clicked!')}
-                        />
-                    </div>
-                </header>
+      {/* Main area */}
+      <div className="flex-1 flex flex-col lg:ml-64">
+                  {/* Header */}
+        <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
+          <div className="flex items-center justify-end">
+            <HeaderRightSection
+              notificationCount={3}
+              imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+              name="Admin"
+              onNotificationClick={() => alert('Notifications clicked!')}
+            />
+          </div>
+        </header>
 
-                <main className="pt-8">
+                <main className="p-8">
                     <div className="flex items-center justify-between mb-4">
                         <h1 className="text-3xl font-bold text-gray-900">Teachers</h1>
                         <div className="flex gap-4">

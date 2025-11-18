@@ -37,11 +37,11 @@ const Sidebar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const mainNavItems = [
-        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', to: '/' },
+        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', to: '/dashboard' },
         { icon: <GraduationCap size={20} />, label: 'Teachers', to: '/teachers' },
         { icon: <Users size={20} />, label: 'Students', to: '/students' },
         { icon: <BookOpen size={20} />, label: 'Classes', to: '/classes' },
-        { icon: <Calendar size={20} />, label: 'Events & Calendar', to: '/events' },
+        { icon: <Calendar size={20} />, label: 'Events & Calendar', to: '/event-management' },
         { icon: <Utensils size={20} />, label: 'Meal Plan', to: '/meal-plan' },
         { icon: <FileText size={20} />, label: 'Reports', to: '/reports' },
     ];
