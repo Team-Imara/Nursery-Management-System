@@ -1,66 +1,90 @@
+// src/components/HeaderRightSection.jsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, ChevronDown } from 'lucide-react';
+// src/components/HeaderRightSection.jsx
+import { useProfile } from '../hooks/useProfile'; // Correct
 
-const HeaderRightSection = ({ notificationCount = 3, imageSrc = 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100', name = 'Admin', onNotificationClick }) => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+const HeaderRightSection = ({ notificationCount = 0, onNotificationClick }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const { profile } = useProfile(); // Get latest name & avatar
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
+  const toggleDropdown = () => setIsDropdownOpen((v) => !v);
 
-    const handleProfileClick = () => {
-        alert('Profile clicked!');
-        setIsDropdownOpen(false);
-    };
+  const go = (path) => () => {
+    navigate(path);
+    setIsDropdownOpen(false);
+  };
 
-    const handleLogoutClick = () => {
-        alert('Logout clicked!');
-        setIsDropdownOpen(false);
-    };
+  return (
+    <div className="flex items-center gap-4">
+      {/* Notification Bell */}
+      <button
+        onClick={onNotificationClick}
+        className="relative p-2 rounded-full hover:bg-gray-100 transition-colors"
+      >
+        <Bell className="w-5 h-5 text-gray-700" />
+        {notificationCount > 0 && (
+          <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+            {notificationCount}
+          </span>
+        )}
+      </button>
 
-    return (
-        <div className="flex items-center gap-4">
+      {/* Profile Dropdown */}
+      <div className="relative">
+        <button
+          onClick={toggleDropdown}
+          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-300">
+            <img
+              src={profile.avatar_url}
+              alt={profile.full_name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <span className="text-sm font-medium text-gray-900">
+            {profile.full_name}
+          </span>
+          <ChevronDown
+            className={`w-4 h-4 text-gray-600 transition-transform ${
+              isDropdownOpen ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
+
+        {/* Dropdown Menu */}
+        {isDropdownOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
             <button
-                onClick={onNotificationClick}
-                className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={go('/profile')}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-                <Bell size={20} className="text-gray-650" />
-                <span className="absolute top-1.5 right-1.5 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-xs font-semibold text-gray-700">
-                    {notificationCount}
-                </span>
+              Profile
             </button>
-            <div className="flex items-center gap-3 pl-4 border-l border-gray-200 relative">
-                <div className="w-10 h-10 rounded-full overflow-hidden">
-                    <img
-                        src={imageSrc}
-                        alt={name}
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-                <span className="font-medium text-gray-900">{name}</span>
-
-                <button onClick={toggleDropdown} className="ml-2 focus:outline-none">
-                    <ChevronDown size={16} className="text-gray-600" />
-                    {isDropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                            <button onClick={handleProfileClick} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                                Profile
-                            </button>
-                            <button onClick={handleProfileClick} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                                Settings
-                            </button>
-
-                            <button onClick={handleProfileClick} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-
-                            </button>
-
-
-                        </div>
-                    )}
-                </button>
-            </div>
-        </div>
-    );
+            <button
+              onClick={go('/settings')}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            >
+              Settings
+            </button>
+            <hr className="my-1 border-gray-200" />
+            <button
+              onClick={() => {
+                localStorage.removeItem('userProfile');
+                navigate('/login');
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default HeaderRightSection;
