@@ -42,6 +42,8 @@ const Sidebar = () => {
         { icon: <Users size={20} />, label: 'Students', to: '/students' },
         { icon: <BookOpen size={20} />, label: 'Classes', to: '/class-management' },
         { icon: <Calendar size={20} />, label: 'Events & Calendar', to: '/events' },
+        { icon: <BookOpen size={20} />, label: 'Classes', to: '/classes' },
+        { icon: <Calendar size={20} />, label: 'Events & Calendar', to: '/event-management' },
         { icon: <Utensils size={20} />, label: 'Meal Plan', to: '/meal-plan' },
         { icon: <FileText size={20} />, label: 'Reports', to: '/reports' },
     ];

@@ -10,9 +10,21 @@ import SettingsPage from './layout/SettingsPage';
 import ClassManagement from './layout/ClassManagement.jsx';
 import AddNewClass from './layout/AddNewClass.jsx';
 import ViewTimetable from './layout/ViewTimetable.jsx';
+import Students from './layout/Students.jsx';
+import StudentDetail from './layout/StudentDetail.jsx';
+import AddStudent from './layout/AddStudent.jsx';
+import SendMessage from './components/SendMessage.jsx';
+import EventManagement from './layout/EventManagement';
+import EventDetail from './layout/EventDetail.jsx';
+import MealPlan from "./layout/MealPlan.jsx";
+import StudentHealth from "./layout/StudentHealth.jsx";
+import DailyMeal from "./layout/DailyMeal.jsx";
+import { AppProvider } from './context/AppContext';
+
 
 function App() {
     return (
+        <AppProvider>
         <Router>
             <Routes>
                 <Route path="/" element={<LoginPage />} />
@@ -27,8 +39,21 @@ function App() {
                  <Route path="/AddNewClass" element={<AddNewClass />} />
                 <Route path="/ViewTimetable" element={<ViewTimetable />} />
                 
+                <Route path="/students" element={<Students />} />
+                {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
+                <Route path="/students/detail" element={<StudentDetail />} />
+                <Route path="/add-student" element={<AddStudent />} />
+                <Route path="/send-message" element={<SendMessage />} />
+                <Route path="/event-management" element={<EventManagement />} />
+                <Route path="/event/:date" element={<EventDetail />} />
+
+                <Route path="/meal-plan" element={<MealPlan/>} />
+                <Route path="/student-health" element={<StudentHealth/>} />
+                <Route path="/daily-meal" element={<DailyMeal/>} />
+               
             </Routes>
         </Router>
+        </AppProvider>
     );
 }
 
