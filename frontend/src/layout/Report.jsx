@@ -8,6 +8,7 @@ import FiltersPanel from '../components/FiltersPanel';
 import HeaderRightSection from '../components/HeaderRightSection';
 import Sidebar from '../components/Sidebar';
 
+
 export default function Reports() {
   const [activeTab, setActiveTab] = useState('progress');
 

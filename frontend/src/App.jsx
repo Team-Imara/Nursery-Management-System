@@ -19,6 +19,7 @@ import EventDetail from './layout/EventDetail.jsx';
 import MealPlan from "./layout/MealPlan.jsx";
 import StudentHealth from "./layout/StudentHealth.jsx";
 import DailyMeal from "./layout/DailyMeal.jsx";
+import Report from './layout/Report.jsx';
 import { AppProvider } from './context/AppContext';
 
 
@@ -38,7 +39,7 @@ function App() {
                  <Route path="/class-management" element={<ClassManagement />} />
                  <Route path="/AddNewClass" element={<AddNewClass />} />
                 <Route path="/ViewTimetable" element={<ViewTimetable />} />
-                
+                <Route path="/reports" element={<Report />} />
                 <Route path="/students" element={<Students />} />
                 {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
                 <Route path="/students/detail" element={<StudentDetail />} />
