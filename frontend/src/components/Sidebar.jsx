@@ -40,6 +40,8 @@ const Sidebar = () => {
         { icon: <LayoutDashboard size={20} />, label: 'Dashboard', to: '/dashboard' },
         { icon: <GraduationCap size={20} />, label: 'Teachers', to: '/teachers' },
         { icon: <Users size={20} />, label: 'Students', to: '/students' },
+        { icon: <BookOpen size={20} />, label: 'Classes', to: '/class-management' },
+        { icon: <Calendar size={20} />, label: 'Events & Calendar', to: '/events' },
         { icon: <BookOpen size={20} />, label: 'Classes', to: '/classes' },
         { icon: <Calendar size={20} />, label: 'Events & Calendar', to: '/event-management' },
         { icon: <Utensils size={20} />, label: 'Meal Plan', to: '/meal-plan' },
@@ -88,7 +90,7 @@ const Sidebar = () => {
                 </div>
 
                 {/* Main Navigation */}
-                <nav className="flex-1 px-3 py-6 overflow-y-auto">
+                <nav className="flex-1 px-3 py-6 overflow-y-auto scrollbar-hide">
                     <div className="mb-4">
                         <p className="px-4 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             Main
@@ -118,6 +120,17 @@ const Sidebar = () => {
                     ))}
                 </div>
             </aside>
+
+            {/* CSS to hide scrollbar */}
+            <style jsx>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none; /* IE and Edge */
+                    scrollbar-width: none; /* Firefox */
+                }
+            `}</style>
         </>
     );
 };
