@@ -1,44 +1,55 @@
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
+import HeaderRightSection from '../components/HeaderRightSection';
 import { useNavigate } from "react-router-dom";
 
 
 const Header = () => {
   return (
-    <header className="flex justify-between items-center bg-white shadow rounded-2xl px-6 py-4 mb-6">
-      <h1 className="text-2xl font-bold text-slate-900">
-        Event Management & Notifications
-      </h1>
+    // <header className="flex justify-between items-center bg-white shadow rounded-2xl px-6 py-4 mb-6">
+    //   <h1 className="text-2xl font-bold text-slate-900">
+    //     Event Management & Notifications
+    //   </h1>
 
-      {/* Right section: icons, notifications, profile */}
-      <div className="flex items-center gap-4">
-        {/* Notification Icon */}
-        <button className="relative">
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-slate-700 hover:text-slate-900 transition"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.8}
-              d="M15 17h5l-1.405-1.405M19 13V8a7 7 0 10-14 0v5l-1.405 1.405A1 1 0 005 17h10m0 0a3 3 0 11-6 0h6z"
-            />
-          </svg>
-        </button>
+    //   {/* Right section: icons, notifications, profile */}
+    //   <div className="flex items-center gap-4">
+    //     {/* Notification Icon */}
+    //     <button className="relative">
+    //       <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+    //       <svg
+    //         xmlns="http://www.w3.org/2000/svg"
+    //         className="h-6 w-6 text-slate-700 hover:text-slate-900 transition"
+    //         fill="none"
+    //         viewBox="0 0 24 24"
+    //         stroke="currentColor"
+    //       >
+    //         <path
+    //           strokeLinecap="round"
+    //           strokeLinejoin="round"
+    //           strokeWidth={1.8}
+    //           d="M15 17h5l-1.405-1.405M19 13V8a7 7 0 10-14 0v5l-1.405 1.405A1 1 0 005 17h10m0 0a3 3 0 11-6 0h6z"
+    //         />
+    //       </svg>
+    //     </button>
 
-        {/* Profile Avatar */}
-        <img
-          src="https://i.pravatar.cc/40"
-          alt="User Avatar"
-          className="w-9 h-9 rounded-full border border-gray-300"
-        />
-      </div>
-    </header>
+    //     {/* Profile Avatar */}
+    //     <img
+    //       src="https://i.pravatar.cc/40"
+    //       alt="User Avatar"
+    //       className="w-9 h-9 rounded-full border border-gray-300"
+    //     />
+    //   </div>
+    // </header>
+
+    <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
+                    <div className="flex items-center justify-end">
+                        <HeaderRightSection
+                            notificationCount={2}
+                            imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+                            name="Admin"
+                        />
+                    </div>
+                </header>
   );
 };
 
