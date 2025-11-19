@@ -203,7 +203,8 @@ const Teachers = () => {
     const newTeacher = location.state?.newTeacher;
 
     useEffect(() => {
-        if (newTeacher) {
+        if (newTeacher)
+             {
             setTeachers((prevTeachers) => [
                 ...prevTeachers,
                 { ...newTeacher, id: prevTeachers.length + 1 },
@@ -245,7 +246,12 @@ const Teachers = () => {
 
                 <main className="p-8">
                     <div className="flex items-center justify-between mb-4">
-                        <h1 className="text-3xl font-bold text-gray-900">Teachers</h1>
+                       <h1
+          className="text-3xl font-extrabold text-gray-900 mb-8"
+          style={{ fontFamily: '"Poppins", sans-serif' }}
+        >
+          Teachers
+        </h1>
                         <div className="flex gap-4">
                             <button
                                 onClick={() => navigate('/add-teacher')}
@@ -323,7 +329,7 @@ const Teachers = () => {
                             animate="animate"
                         >
                             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 sticky top-8">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6">Highlighted Teacher</h2>
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Principal</h2>
                                 {highlightedTeacher && (
                                     <>
                                         <div className="flex items-start gap-4 mb-6">
@@ -361,9 +367,7 @@ const Teachers = () => {
                                             <button className="flex-1 px-4 py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium">
                                                 Message
                                             </button>
-                                            <button className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                                                Assign Class
-                                            </button>
+                                        
                                         </div>
                                     </>
                                 )}

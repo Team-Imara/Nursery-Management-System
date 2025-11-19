@@ -12,10 +12,21 @@ export default function LoginPage() {
 
     const navigate = useNavigate(); // Initialize navigate
 
-    const handleLogin = () => {
-    // Simulate immediate navigation without backend logic
-    navigate('/dashboard');
-};
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        try {
+            // Simulate a delay to mimic login process (no backend logic)
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // 1-second delay
+            // Navigate to dashboard after delay
+            navigate('/dashboard');
+        } catch (err) {
+            setError('An error occurred. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#e8e9eb] flex items-center justify-center p-4 fixed inset-0 overflow-hidden">
@@ -92,8 +103,7 @@ export default function LoginPage() {
                                 </div>
                             )}
                             {/* Login Button */}
-                            <button type="submit" disabled={loading} onClick={() => navigate('/dashboard')}  className="w-full bg-[#1e3a5f] hover:bg-[#152d4a] text-white font-semibold py-3 px-5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg">
-                                
+                            <button type="submit" disabled={loading} className="w-full bg-[#1e3a5f] hover:bg-[#152d4a] text-white font-semibold py-3 px-5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                                 </svg>

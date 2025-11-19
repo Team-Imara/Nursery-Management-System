@@ -5,6 +5,11 @@ import AddTeacher from './layout/AddTeacher.jsx';
 import ManageLeaveRequests from './layout/ManageLeaveRequests.jsx';
 import Dashboard from "./layout/Dashboard.jsx";
 import LoginPage from "./layout/LoginPage.jsx";
+import ProfilePage from './layout/ProfilePage';
+import SettingsPage from './layout/SettingsPage';
+import ClassManagement from './layout/ClassManagement.jsx';
+import AddNewClass from './layout/AddNewClass.jsx';
+import ViewTimetable from './layout/ViewTimetable.jsx';
 import Students from './layout/Students.jsx';
 import StudentDetail from './layout/StudentDetail.jsx';
 import AddStudent from './layout/AddStudent.jsx';
@@ -15,7 +20,7 @@ import MealPlan from "./layout/MealPlan.jsx";
 import StudentHealth from "./layout/StudentHealth.jsx";
 import DailyMeal from "./layout/DailyMeal.jsx";
 import { AppProvider } from './context/AppContext';
-import Reports from './layout/Report.jsx';
+
 
 function App() {
     return (
@@ -28,6 +33,12 @@ function App() {
                 <Route path="/teacher/:id" element={<TeacherDetail />} />
                 <Route path="/add-teacher" element={<AddTeacher />} />
                 <Route path="/manage-leave-requests" element={<ManageLeaveRequests />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                 <Route path="/class-management" element={<ClassManagement />} />
+                 <Route path="/AddNewClass" element={<AddNewClass />} />
+                <Route path="/ViewTimetable" element={<ViewTimetable />} />
+                
                 <Route path="/students" element={<Students />} />
                 {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
                 <Route path="/students/detail" element={<StudentDetail />} />
@@ -39,7 +50,7 @@ function App() {
                 <Route path="/meal-plan" element={<MealPlan/>} />
                 <Route path="/student-health" element={<StudentHealth/>} />
                 <Route path="/daily-meal" element={<DailyMeal/>} />
-                <Route path="/reports" element={<Reports/>} />
+               
             </Routes>
         </Router>
         </AppProvider>

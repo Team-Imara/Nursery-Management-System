@@ -72,19 +72,19 @@ const AddTeacher = () => {
         <div className="flex w-full min-h-screen bg-gray-50">
             <Sidebar />
 
+            
+
             <div className="flex-1 ml-64 p-8">
                 <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-                    <div className="flex items-center justify-start">
-                        <button
-                            onClick={() => navigate('/teachers')}
-                            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                            <ArrowLeft size={20} />
-                            Back to Teachers
-                        </button>
+                    <div className="flex items-center justify-end">
+                        <HeaderRightSection
+                            notificationCount={3}
+                            imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+                            name="Admin"
+                            onNotificationClick={() => alert('Notifications clicked!')}
+                        />
                     </div>
                 </header>
-
                 <main className="pt-8">
                     <div className="max-w-2xl mx-auto">
                         <h1 className="text-3xl font-bold text-gray-900 mb-6">Add New Teacher</h1>
