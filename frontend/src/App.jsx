@@ -38,6 +38,7 @@ function App() {
                  <Route path="/class-management" element={<ClassManagement />} />
                  <Route path="/AddNewClass" element={<AddNewClass />} />
                 <Route path="/ViewTimetable" element={<ViewTimetable />} />
+
                 
                 <Route path="/students" element={<Students />} />
                 {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
