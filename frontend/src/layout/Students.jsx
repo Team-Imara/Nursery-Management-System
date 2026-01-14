@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -72,6 +72,20 @@ const Students = () => {
     return matchesSearch && matchesClass && matchesStatus;
   });
 
+  const attendanceVariants = {
+  initial: { y: 40, opacity: 0 },
+  animate: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+      damping: 12,
+      duration: 0.6,
+    },
+  },
+};
+
   // Attendance Summary Data
   const studentWeeklyAttendance = [
     {
@@ -101,9 +115,18 @@ const Students = () => {
   const presentStudents = students.filter(s => s.status === 'Present').length;
   const absentStudents = students.filter(s => s.status === 'Absent').length;
 
+  /* -------------------------------------------------
+     Framer Motion Variants
+     ------------------------------------------------- */
+  const containerVariants = {
+    initial: {},
+    animate: { transition: { staggerChildren: 0.1 } },
+  };
+
   const cardVariants = {
-    initial: { y: 40, opacity: 0 },
-    animate: { y: 0, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+    initial: { y: 50, opacity: 0 },
+    animate: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 120, damping: 12 } },
+    exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
   };
 
   return (
@@ -134,27 +157,39 @@ const Students = () => {
           </div>
 
           {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+            variants={containerVariants}
+            initial="initial"
+            animate="animate"
+          >
+            <motion.div variants={cardVariants} className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg">
               <p className="text-blue-100 text-sm font-medium">Overall Students</p>
               <p className="text-4xl font-bold mt-2">{totalStudents}</p>
-            </div>
-            <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
+            </motion.div>
+            <motion.div variants={cardVariants} className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
               <p className="text-green-100 text-sm font-medium">Present Today</p>
               <p className="text-4xl font-bold mt-2">{presentStudents}</p>
-            </div>
-            <div className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-2xl p-6 shadow-lg">
-              <p className="text-red-100 text Khalil text-sm font-medium">Absent Today</p>
+            </motion.div>
+            <motion.div variants={cardVariants} className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-2xl p-6 shadow-lg">
+              <p className="text-red-100 text-sm font-medium">Absent Today</p>
               <p className="text-4xl font-bold mt-2">{absentStudents}</p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Weekly Attendance Table */}
-          <WeeklyAttendanceSummary
-            title="Student Attendance – This Week"
-            type="student"
-            data={studentWeeklyAttendance}
-          />
+          
+          <motion.div
+            variants={attendanceVariants}
+            initial="initial"
+            animate="animate"
+          >
+            <WeeklyAttendanceSummary
+              title="Student Attendance – This Week"
+              type="student"
+              data={studentWeeklyAttendance}
+            />
+          </motion.div>
+
 
           {/* Search & Filters */}
           <div className="flex flex-wrap items-center gap-4 mb-8">
@@ -192,24 +227,27 @@ const Students = () => {
           </div>
 
           {/* Student Cards */}
-          <motion.div
-            variants={cardVariants}
-            initial="initial"
-            animate="animate"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          >
-            {filteredStudents.map((student) => (
-              <div
-                key={student.id}
-                onClick={() => navigate('/students/detail', { state: { student } })}
-                className="cursor-pointer group"
-              >
-                <div className="transform group-hover:scale-105 transition-transform duration-300">
+          <AnimatePresence>
+            <motion.div
+              variants={containerVariants}
+              initial="initial"
+              animate="animate"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {filteredStudents.map((student) => (
+                <motion.div
+                  key={student.id}
+                  variants={cardVariants}
+                  whileHover={{ scale: 1.05 }}
+                  exit="exit"
+                  onClick={() => navigate('/students/detail', { state: { student } })}
+                  className="cursor-pointer"
+                >
                   <StudentCard student={student} />
-                </div>
-              </div>
-            ))}
-          </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
 
           {filteredStudents.length === 0 && (
             <div className="text-center py-20">
