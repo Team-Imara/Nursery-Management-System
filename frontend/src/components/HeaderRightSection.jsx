@@ -49,9 +49,8 @@ const HeaderRightSection = ({ notificationCount = 0, onNotificationClick }) => {
             {profile.full_name}
           </span>
           <ChevronDown
-            className={`w-4 h-4 text-gray-600 transition-transform ${
-              isDropdownOpen ? 'rotate-180' : ''
-            }`}
+            className={`w-4 h-4 text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''
+              }`}
           />
         </button>
 
@@ -73,8 +72,11 @@ const HeaderRightSection = ({ notificationCount = 0, onNotificationClick }) => {
             <hr className="my-1 border-gray-200" />
             <button
               onClick={() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('user');
                 localStorage.removeItem('userProfile');
-                navigate('/login');
+                navigate('/');
               }}
               className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
             >

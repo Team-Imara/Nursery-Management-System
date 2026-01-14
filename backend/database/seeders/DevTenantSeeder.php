@@ -18,8 +18,10 @@ class DevTenantSeeder extends Seeder
         $tenant = Tenant::firstOrCreate(['id' => 'dev-tenant']);
         
         // 2. Create or Find Domain
-        if (!$tenant->domains()->where('domain', 'tenant1.localhost')->exists()) {
-            $tenant->domains()->create(['domain' => 'tenant1.localhost']);
+        foreach (['tenant1.localhost', 'localhost', '127.0.0.1'] as $domain) {
+            if (!$tenant->domains()->where('domain', $domain)->exists()) {
+                $tenant->domains()->create(['domain' => $domain]);
+            }
         }
 
         // 3. Initialize Tenancy for session
@@ -27,9 +29,10 @@ class DevTenantSeeder extends Seeder
 
         // 4. Create an Admin User for this tenant
         $admin = User::firstOrCreate(
-            ['email' => 'admin@nursery.com'],
+            ['username' => 'admin'],
             [
                 'fullname' => 'Admin User',
+                'email' => 'admin@nursery.com',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'tenant_id' => $tenant->id,
