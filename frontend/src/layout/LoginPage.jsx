@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { Lock, Shield, Users, Search, Eye, EyeOff, Home } from 'lucide-react';
+import axios from '../api/axios';
 
 export default function LoginPage() {
     const [userId, setUserId] = useState('');
@@ -17,12 +18,33 @@ export default function LoginPage() {
         setLoading(true);
         setError('');
         try {
-            // Simulate a delay to mimic login process (no backend logic)
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // 1-second delay
-            // Navigate to dashboard after delay
-            navigate('/dashboard');
+            const response = await axios.post('/login', {
+                username: userId,
+                password: password,
+            });
+
+            const { token, user } = response.data;
+
+            // Store auth data
+            localStorage.setItem('token', token);
+            localStorage.setItem('role', user.role);
+            localStorage.setItem('user', JSON.stringify(user));
+
+            // Role-based redirection
+            if (user.role === 'admin') {
+                navigate('/dashboard');
+            } else if (user.role === 'teacher') {
+                navigate('/dashboard'); // Currently using same dashboard, can be changed if tutor dashboard is added
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
-            setError('An error occurred. Please try again.');
+            if (err.response && err.response.status === 401) {
+                setError('Invalid username or password.');
+            } else {
+                setError('An error occurred. Please try again later.');
+            }
+            console.error('Login error:', err);
         } finally {
             setLoading(false);
         }
@@ -75,8 +97,8 @@ export default function LoginPage() {
                         <form onSubmit={handleLogin} className="space-y-5 px-4">
                             {/* User ID Field */}
                             <div>
-                                <label htmlFor="userId" className="block text-sm font-semibold text-gray-700 mb-2 text-left">User ID</label>
-                                <input id="userId" type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Enter your assigned User ID" className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none text-gray-900 placeholder:text-gray-400" required />
+                                <label htmlFor="userId" className="block text-sm font-semibold text-gray-700 mb-2 text-left">Username</label>
+                                <input id="userId" type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Enter your assigned Username" className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none text-gray-900 placeholder:text-gray-400" required />
                             </div>
                             {/* Password Field */}
                             <div>

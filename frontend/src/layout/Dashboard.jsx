@@ -6,6 +6,11 @@ import HeaderRightSection from '../components/HeaderRightSection.jsx';
 
 
 const Dashboard = () => {
+    // Get user info from localStorage
+    const savedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+    const userRole = localStorage.getItem('role') || 'admin';
+    const userName = savedUser ? savedUser.fullname : (userRole === 'admin' ? 'Admin' : 'Tutor');
+
     // State to track which card is being hovered
     const [hoveredCard, setHoveredCard] = useState(null);
 
@@ -62,7 +67,7 @@ const Dashboard = () => {
                             <HeaderRightSection
                                 notificationCount={3}
                                 imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-                                name="Admin"
+                                name={userName}
                                 onNotificationClick={() => alert('Notifications clicked!')}
                             />
                         </div>
@@ -72,7 +77,9 @@ const Dashboard = () => {
                 {/* Main Content */}
                 <main className="p-6 flex-1">
                     <div className="max-w-7xl mx-auto">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+                            {userRole === 'admin' ? 'Admin Dashboard' : 'Tutor Dashboard'}
+                        </h1>
 
                         {/* Top Stats Section */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
@@ -329,45 +336,45 @@ const Dashboard = () => {
                             <div className="bg-white rounded-xl shadow-sm border border-gray-100">
                                 <table className="">
                                     <thead className="bg-gray-50 border-b border-gray-200">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Class</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Students</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Teachers</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Attendance Today</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"></th>
-                                    </tr>
+                                        <tr>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Class</th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Students</th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Teachers</th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Attendance Today</th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"></th>
+                                        </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
-                                    <tr className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm text-gray-900">Kindergarten 1</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">124</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">16</td>
-                                        <td className="px-6 py-4">
+                                        <tr className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm text-gray-900">Kindergarten 1</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">124</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">16</td>
+                                            <td className="px-6 py-4">
                                                 <span className="inline-block bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">
                                                     96%
                                                 </span>
-                                        </td>
-                                        <td className="px-3 py-1">
-                                            <button className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
-                                                View
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm text-gray-900">Kindergarten 2</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">124</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">16</td>
-                                        <td className="px-6 py-4">
+                                            </td>
+                                            <td className="px-3 py-1">
+                                                <button className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                                    View
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm text-gray-900">Kindergarten 2</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">124</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">16</td>
+                                            <td className="px-6 py-4">
                                                 <span className="inline-block bg-yellow-100 text-yellow-700 text-sm font-medium px-3 py-1 rounded-full">
                                                     91%
                                                 </span>
-                                        </td>
-                                        <td className="px-3 py-1">
-                                            <button className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
-                                                View
-                                            </button>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                            <td className="px-3 py-1">
+                                                <button className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                                    View
+                                                </button>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>

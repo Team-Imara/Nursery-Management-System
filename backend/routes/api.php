@@ -22,22 +22,61 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 
-// Tenant-aware guest routes
-Route::middleware(['tenancy', 'guest'])->group(function () {
+// Guest routes - Move out of 'tenancy' to allow centralized login from central domains (like localhost)
+Route::group([], function () {
     Route::post('/register', [UserController::class, 'store']); // Custom register in UserController
+    
     Route::post('/login', function (Request $request) {
-        // Breeze/Sanctum login logic
-        $credentials = $request->validate(['email' => 'required|email', 'password' => 'required']);
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string'
+        ]);
+        
+        try {
+            // Find user globally to identify their tenant (username is unique globally)
+            $user = User::withoutGlobalScopes()->where('username', $credentials['username'])->first();
+            
+            if (!$user || !Hash::check($credentials['password'], $user->password)) {
+                return response()->json(['message' => 'Invalid credentials'], 401);
+            }
+
+            // Verify tenant exists before initializing
+            if (!Tenant::where('id', $user->tenant_id)->exists()) {
+                 return response()->json(['message' => 'Tenant associated with this user not found'], 404);
+            }
+
+            // Initialize tenancy for this context
+            tenancy()->initialize($user->tenant_id);
+
+            // Generate JWT token
+            if (!$token = auth('api')->login($user)) {
+                return response()->json(['message' => 'Could not create token'], 500);
+            }
+
+            return response()->json([
+                'token' => $token,
+                'user' => [
+                    'fullname' => $user->fullname,
+                    'role' => $user->role,
+                    'username' => $user->username,
+                    'tenant_id' => $user->tenant_id
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Server Error during login',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        $user = Auth::user();
-        $token = $user->createToken('api-token')->plainTextToken;
-        return response()->json(['token' => $token]);
+    });
+
+    Route::post('/logout', function() {
+        auth('api')->logout();
+        return response()->json(['message' => 'Successfully logged out']);
     });
 });
 
-Route::middleware(['auth:sanctum', 'tenancy'])->group(function () {
+Route::middleware(['auth:api', 'tenancy'])->group(function () {
     //Teacher Management
     Route::apiResource('users', UserController::class);
 
@@ -121,6 +160,7 @@ Route::post('/tenants', function (Request $request) {
         'name' => 'required|string|max:255',
         'domain' => 'required|string|unique:domains,domain',
         'admin_email' => 'required|email',
+        'admin_username' => 'required|string|unique:users,username',
         'admin_fullname' => 'required|string|max:255',
         'admin_password' => 'required|string|min:8',
     ]);
@@ -143,6 +183,7 @@ Route::post('/tenants', function (Request $request) {
         $admin = User::create([
             'fullname' => $validated['admin_fullname'],
             'email' => $validated['admin_email'],
+            'username' => $validated['admin_username'],
             'password' => Hash::make($validated['admin_password']),
             'role' => 'admin',
         ]);

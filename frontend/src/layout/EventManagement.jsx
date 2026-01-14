@@ -8,14 +8,14 @@ const Header = () => {
   return (
 
     <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-                    <div className="flex items-center justify-end">
-                        <HeaderRightSection
-                            notificationCount={2}
-                            imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-                            name="Admin"
-                        />
-                    </div>
-                </header>
+      <div className="flex items-center justify-end">
+        <HeaderRightSection
+          notificationCount={2}
+          imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+          name="Admin"
+        />
+      </div>
+    </header>
   );
 };
 
@@ -134,11 +134,10 @@ const renderDay = (day) => {
               </p>
             )}
           </div>
-        </div>
-      )}
-    </div>
-  );
-};
+        )}
+      </div>
+    );
+  };
 
 
 
@@ -208,69 +207,66 @@ const renderDay = (day) => {
               </button>
             </div>
 
-            {/* Filter Options */}
-            <div className="flex gap-3 mb-4">
-              <button
-                onClick={() => setFilter("all")}
-                className={`px-3 py-1 rounded ${
-                  filter === "all"
+              {/* Filter Options */}
+              <div className="flex gap-3 mb-4">
+                <button
+                  onClick={() => setFilter("all")}
+                  className={`px-3 py-1 rounded ${filter === "all"
                     ? "bg-slate-900 text-white"
                     : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setFilter("special")}
-                className={`px-3 py-1 rounded ${
-                  filter === "special"
+                    }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilter("special")}
+                  className={`px-3 py-1 rounded ${filter === "special"
                     ? "bg-yellow-400 text-gray-900"
                     : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                Special Events
-              </button>
-              <button
-                onClick={() => setFilter("holiday")}
-                className={`px-3 py-1 rounded ${
-                  filter === "holiday"
+                    }`}
+                >
+                  Special Events
+                </button>
+                <button
+                  onClick={() => setFilter("holiday")}
+                  className={`px-3 py-1 rounded ${filter === "holiday"
                     ? "bg-red-400 text-white"
                     : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                Holidays
-              </button>
+                    }`}
+                >
+                  Holidays
+                </button>
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-2 text-center font-semibold text-gray-600 mb-2">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                  <div key={day}>{day}</div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-2">
+                {Array.from({ length: blanks }).map((_, i) => (
+                  <div key={`b${i}`} className="h-20"></div>
+                ))}
+                {Array.from({ length: daysInMonth }, (_, i) => renderDay(i + 1))}
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center gap-4 mt-4 text-sm text-gray-600">
+                <div className="flex items-center gap-1">
+                  <span className="w-3 h-3 bg-gray-200 rounded-full"></span> Regular
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-3 h-3 bg-red-300 rounded-full"></span> Holidays
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-3 h-3 bg-yellow-300 rounded-full"></span> Events
+                </div>
+              </div>
             </div>
 
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-2 text-center font-semibold text-gray-600 mb-2">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <div key={day}>{day}</div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-2">
-              {Array.from({ length: blanks }).map((_, i) => (
-                <div key={`b${i}`} className="h-20"></div>
-              ))}
-              {Array.from({ length: daysInMonth }, (_, i) => renderDay(i + 1))}
-            </div>
-
-            {/* Legend */}
-            <div className="flex items-center gap-4 mt-4 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-3 bg-gray-200 rounded-full"></span> Regular
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-3 bg-red-300 rounded-full"></span> Holidays
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-3 bg-yellow-300 rounded-full"></span> Events
-              </div>
-            </div>
-          </div>
-
-          {/* Event Editor */}
-          {/* {showForm && ( */}
+            {/* Event Editor */}
+            {/* {showForm && ( */}
             <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
               <h2 className="text-lg font-semibold mb-2 text-slate-800">
                 Create / Manage Event
@@ -353,10 +349,10 @@ const renderDay = (day) => {
                 </button> */}
               </div>
             </div>
-          {/* )} */}
-        </div>
-        
-      </main>
+            {/* )} */}
+          </div>
+
+        </main>
       </div>
     </div>
   );

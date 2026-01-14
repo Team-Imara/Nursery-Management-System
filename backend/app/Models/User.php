@@ -10,11 +10,13 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class User extends Authenticatable {
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+
+class User extends Authenticatable implements JWTSubject {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, BelongsToTenant;
 
     protected $fillable = [
-        'fullname', 'dob', 'email', 'password', 'role', 'phone', 'address', 'nic',
+        'fullname', 'username', 'dob', 'email', 'password', 'role', 'phone', 'address', 'nic',
         'emergency_contact_name', 'emergency_contact_phone', 'teaching_subject',
         'basic_salary', 'join_date', 'qualification', 'experience', 'profile_photo', 'tenant_id'
     ];
@@ -36,4 +38,24 @@ class User extends Authenticatable {
     public function routeNotificationForNotifyLk($notification){
     return $this->phone; // Or emergency_contact_phone
 }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
