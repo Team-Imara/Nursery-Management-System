@@ -6,40 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   return (
-    // <header className="flex justify-between items-center bg-white shadow rounded-2xl px-6 py-4 mb-6">
-    //   <h1 className="text-2xl font-bold text-slate-900">
-    //     Event Management & Notifications
-    //   </h1>
-
-    //   {/* Right section: icons, notifications, profile */}
-    //   <div className="flex items-center gap-4">
-    //     {/* Notification Icon */}
-    //     <button className="relative">
-    //       <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-    //       <svg
-    //         xmlns="http://www.w3.org/2000/svg"
-    //         className="h-6 w-6 text-slate-700 hover:text-slate-900 transition"
-    //         fill="none"
-    //         viewBox="0 0 24 24"
-    //         stroke="currentColor"
-    //       >
-    //         <path
-    //           strokeLinecap="round"
-    //           strokeLinejoin="round"
-    //           strokeWidth={1.8}
-    //           d="M15 17h5l-1.405-1.405M19 13V8a7 7 0 10-14 0v5l-1.405 1.405A1 1 0 005 17h10m0 0a3 3 0 11-6 0h6z"
-    //         />
-    //       </svg>
-    //     </button>
-
-    //     {/* Profile Avatar */}
-    //     <img
-    //       src="https://i.pravatar.cc/40"
-    //       alt="User Avatar"
-    //       className="w-9 h-9 rounded-full border border-gray-300"
-    //     />
-    //   </div>
-    // </header>
 
     <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
                     <div className="flex items-center justify-end">
@@ -134,29 +100,7 @@ const EventManagement = () => {
     );
   };
 
-  // const renderDay = (day) => {
-  //   const event = getEventByDate(day);
-  //   let bgColor = "bg-white";
-  //   if (event?.type === "holiday") bgColor = "bg-red-100 border-red-400";
-  //   if (event?.type === "special") bgColor = "bg-yellow-100 border-yellow-400";
-
-  //   return (
-  //   <div
-  //     key={day}
-  //     className={`border rounded-lg h-20 flex flex-col justify-center items-center text-sm font-medium 
-  //       transition-all duration-200 cursor-pointer 
-  //       ${bgColor} 
-  //       hover:shadow-md hover:scale-[1.03] hover:bg-slate-50`}
-  //   >
-  //     <span>{day}</span>
-  //     {event && (
-  //       <span className="text-xs mt-1 text-center px-1 text-gray-700">
-  //         {event.title}
-  //       </span>
-  //     )}
-  //   </div>
-  // );
-  // };
+ 
 const renderDay = (day) => {
   const event = getEventByDate(day);
   let bgColor = "bg-white";
@@ -164,6 +108,7 @@ const renderDay = (day) => {
   if (event?.type === "special") bgColor = "bg-yellow-100 border-yellow-400";
 
   return (
+
     <div
       key={day}
       className={`relative border rounded-lg h-20 flex flex-col justify-center items-center text-sm font-medium transition-all duration-200 ${bgColor}`}
@@ -199,6 +144,7 @@ const renderDay = (day) => {
 
 
   return (
+    
     <div className="flex min-h-screen bg-slate-100 text-gray-900">
       {/* Sidebar */}
       <Sidebar />
@@ -221,22 +167,27 @@ const renderDay = (day) => {
       <main className="flex-1 p-6 transition-all duration-300">
 
         {/* Top bar (New Event button) */}
-        <div className="flex justify-end mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Interactive Calendar
+          </h1>
+
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800"
+            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-medium hover:bg-green-200"
           >
             + New Event
           </button>
         </div>
 
+
         {/* Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+
+        
           {/* Calendar */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow p-6">
-            <h2 className="text-lg font-semibold mb-4 text-slate-800">
-              Interactive Calendar
-            </h2>
 
             {/* Month Navigation */}
             <div className="flex justify-between items-center mb-4">
