@@ -134,6 +134,7 @@ const renderDay = (day) => {
               </p>
             )}
           </div>
+          </div>
         )}
       </div>
     );
