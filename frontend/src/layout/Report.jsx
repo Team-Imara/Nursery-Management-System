@@ -5,8 +5,7 @@ import ReportSummary from '../components/ReportSummary';
 import GradesTable from '../components/GradesTable';
 import BehaviorTable from '../components/BehaviorTable';
 import FiltersPanel from '../components/FiltersPanel';
-import HeaderRightSection from '../components/HeaderRightSection';
-import Sidebar from '../components/Sidebar';
+import Layout from './Layout.jsx';
 
 
 export default function Reports() {
@@ -39,7 +38,7 @@ export default function Reports() {
   //       // Set state for grades, behavior, etc.
   //     });
   // }, [activeTab]);
-  // Your PHP backend would query MySQL (e.g., via PDO) and return JSON.
+  // Your PHP backend would query MySQL (e.g., via MySQLi/PDO) and return JSON.
   // Example PHP snippet (for reference, place in a file like api/reports.php):
   // <?php
   // $pdo = new PDO('mysql:host=localhost;dbname=your_db', 'user', 'pass');
@@ -49,23 +48,7 @@ export default function Reports() {
   // ?>
 
   return (
-    <div className="flex w-full min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main area */}
-      <div className="flex-1 flex flex-col lg:ml-64">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-          <div className="flex items-center justify-end">
-            <HeaderRightSection
-              notificationCount={3}
-              imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-              name="Admin"
-              onNotificationClick={() => alert('Notifications clicked!')}
-            />
-          </div>
-        </header>
+    <Layout>
       <div className="max-w-[1230px] mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -99,7 +82,6 @@ export default function Reports() {
           </div>
         </div>
       </div>
-      </div>
-    </div>
+    </Layout>
   );
 }

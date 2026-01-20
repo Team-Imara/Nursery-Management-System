@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import Sidebar from '../components/Sidebar';
-import HeaderRightSection from '../components/HeaderRightSection.jsx';
+import Layout from './Layout.jsx';
 
 export default function DailyMeals() {
   const { students, mealRecords, addMealRecord, updateMealRecord } = useAppContext();
@@ -83,20 +82,7 @@ export default function DailyMeals() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-         <Sidebar />
-     
-        <div className="flex-1 flex flex-col lg:ml-64">
-             <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-       <div className="flex items-center justify-end">
-            <HeaderRightSection
-              notificationCount={3}
-              imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-              name="Admin"
-              onNotificationClick={() => alert('Notifications clicked!')}
-            />
-          </div>
-        </header>
+    <Layout>
       <main className="max-w-[1200px] mx-auto p-[2rem] grid grid-cols-1 md:grid-cols-2 gap-[2rem]">
         <section className="bg-white rounded-[12px] p-[2rem] shadow-[0_4px_6px_rgba(0,0,0,0.1)] md:col-span-2">
           <h2 className="text-[1.5rem] text-[#2d3748] mb-[1.5rem]">Manage Meal Records for {selectedDate}</h2>
@@ -232,7 +218,6 @@ export default function DailyMeals() {
           )}
         </section>
       </main>
-    </div>
-    </div>
+    </Layout>
   );
 }

@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import HeaderRightSection from '../components/HeaderRightSection.jsx';
-import Sidebar from '../components/Sidebar';
 import { motion } from 'framer-motion';
+import Layout from './Layout.jsx';
 
 const StudentHealth = () => {
   const { students, updateStudentHealth, addStudent } = useAppContext();
@@ -92,27 +90,14 @@ const StudentHealth = () => {
     : students.filter(s => s.grade === currentTab);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-         <Sidebar />
-     
-        <div className="flex-1 flex flex-col lg:ml-64">
-             <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-       <div className="flex items-center justify-end">
-            <HeaderRightSection
-              notificationCount={3}
-              imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-              name="Admin"
-              onNotificationClick={() => alert('Notifications clicked!')}
-            />
-          </div>
-        </header>
+    <Layout>
       <main className="max-w-6xl mx-auto p-8 flex flex-col gap-8">
         <motion.div
-            initial="initial"
-            animate="animate"
-            variants={{
-              animate: { transition: { staggerChildren: 0.15 } },
-            }} className="bg-white rounded-xl p-8 shadow-md">
+          initial="initial"
+          animate="animate"
+          variants={{
+            animate: { transition: { staggerChildren: 0.15 } },
+          }} className="bg-white rounded-xl p-8 shadow-md">
           <h2 className="text-xl text-blue-800 mb-6">Manage Student Health Information</h2>
           {showSuccess && (
             <div className="p-4 rounded-lg mb-6 font-medium bg-green-100 text-green-800 border border-green-400" role="alert">
@@ -244,7 +229,7 @@ const StudentHealth = () => {
               onClick={() => setCurrentTab('kg1')}
               className={`${currentTab === 'kg1' ? 'bg-white text-indigo-500 border-b-2 border-indigo-500' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} px-4 py-2 rounded-t-lg font-medium focus:outline-none transition-colors duration-200`}
             >
-             Kindergarten1
+              Kindergarten1
             </button>
             <button
               onClick={() => setCurrentTab('kg2')}
@@ -284,9 +269,7 @@ const StudentHealth = () => {
           </table>
         </section>
       </main>
-      </div>
-    </div>
+    </Layout>
   );
- 
 }
- export default StudentHealth;
+export default StudentHealth;

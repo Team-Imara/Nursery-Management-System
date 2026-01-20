@@ -14,16 +14,16 @@ import {
     X,
     Home,
 } from 'lucide-react';
+import { useSettings } from '../context/SettingsContext';
 
 const NavItem = ({ icon, label, to }) => {
     return (
         <NavLink
             to={to}
             className={({ isActive }) =>
-                `w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-200 rounded-lg ${
-                    isActive
-                        ? 'bg-white/10 text-white border-l-4 border-blue-400'
-                        : 'text-gray-300 hover:bg-white/5 hover:text-white border-l-4 border-transparent'
+                `w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-200 rounded-lg ${isActive
+                    ? 'bg-white/10 text-white border-l-4 border-blue-400'
+                    : 'text-gray-300 hover:bg-white/5 hover:text-white border-l-4 border-transparent'
                 }`
             }
         >
@@ -34,6 +34,7 @@ const NavItem = ({ icon, label, to }) => {
 };
 
 const Sidebar = () => {
+    const { settings } = useSettings();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const mainNavItems = [
@@ -77,16 +78,21 @@ const Sidebar = () => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed left-0 top-0 h-screen w-64 bg-slate-900 flex flex-col z-40 transition-transform duration-300 ease-in-out ${
-                    isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-                }`}
+                className={`fixed left-0 top-0 h-screen w-64 bg-slate-900 flex flex-col z-40 transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                    }`}
             >
                 {/* Logo Section */}
                 <div className="flex items-center gap-3 px-6 py-6 border-b border-slate-800">
-                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                        <Home size={20} className="text-white" />
+                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center overflow-hidden">
+                        {settings.nursery.logo_url ? (
+                            <img src={settings.nursery.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                        ) : (
+                            <Home size={20} className="text-white" />
+                        )}
                     </div>
-                    <h1 className="text-xl font-bold text-white">ABC Nursery</h1>
+                    <h1 className="text-xl font-bold text-white truncate max-w-[150px]" title={settings.nursery.name}>
+                        {settings.nursery.name}
+                    </h1>
                 </div>
 
                 {/* Main Navigation */}
