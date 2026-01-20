@@ -23,37 +23,41 @@ import Report from './layout/Report.jsx';
 import { AppProvider } from './context/AppContext';
 
 
+import { SettingsProvider } from './context/SettingsContext';
+
 function App() {
     return (
         <AppProvider>
-        <Router>
-            <Routes>
-                <Route path="/" element={<LoginPage />} />
-                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/teachers" element={<Teachers />} />
-                <Route path="/teacher/:id" element={<TeacherDetail />} />
-                <Route path="/add-teacher" element={<AddTeacher />} />
-                <Route path="/manage-leave-requests" element={<ManageLeaveRequests />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                 <Route path="/class-management" element={<ClassManagement />} />
-                 <Route path="/AddNewClass" element={<AddNewClass />} />
-                <Route path="/ViewTimetable" element={<ViewTimetable />} />
-                <Route path="/reports" element={<Report />} />
-                <Route path="/students" element={<Students />} />
-                {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
-                <Route path="/students/detail" element={<StudentDetail />} />
-                <Route path="/add-student" element={<AddStudent />} />
-                <Route path="/send-message" element={<SendMessage />} />
-                <Route path="/event-management" element={<EventManagement />} />
-                <Route path="/event/:date" element={<EventDetail />} />
+            <SettingsProvider>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/teachers" element={<Teachers />} />
+                        <Route path="/teacher/:id" element={<TeacherDetail />} />
+                        <Route path="/add-teacher" element={<AddTeacher />} />
+                        <Route path="/manage-leave-requests" element={<ManageLeaveRequests />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/settings" element={<SettingsPage />} />
+                        <Route path="/class-management" element={<ClassManagement />} />
+                        <Route path="/AddNewClass" element={<AddNewClass />} />
+                        <Route path="/ViewTimetable" element={<ViewTimetable />} />
+                        <Route path="/reports" element={<Report />} />
+                        <Route path="/students" element={<Students />} />
+                        {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
+                        <Route path="/students/detail" element={<StudentDetail />} />
+                        <Route path="/add-student" element={<AddStudent />} />
+                        <Route path="/send-message" element={<SendMessage />} />
+                        <Route path="/event-management" element={<EventManagement />} />
+                        <Route path="/event/:date" element={<EventDetail />} />
 
-                <Route path="/meal-plan" element={<MealPlan/>} />
-                <Route path="/student-health" element={<StudentHealth/>} />
-                <Route path="/daily-meal" element={<DailyMeal/>} />
-               
-            </Routes>
-        </Router>
+                        <Route path="/meal-plan" element={<MealPlan />} />
+                        <Route path="/student-health" element={<StudentHealth />} />
+                        <Route path="/daily-meal" element={<DailyMeal />} />
+
+                    </Routes>
+                </Router>
+            </SettingsProvider>
         </AppProvider>
     );
 }

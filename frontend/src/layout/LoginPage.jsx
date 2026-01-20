@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Shield, Users, Search, Eye, EyeOff, Home } from 'lucide-react';
 import axios from '../api/axios';
+import { useSettings } from '../context/SettingsContext';
+import SplashScreen from './SplashScreen';
 
 export default function LoginPage() {
     const [userId, setUserId] = useState('');
@@ -10,8 +12,10 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showSplash, setShowSplash] = useState(false);
 
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
+    const { fetchSettings } = useSettings();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -30,14 +34,13 @@ export default function LoginPage() {
             localStorage.setItem('role', user.role);
             localStorage.setItem('user', JSON.stringify(user));
 
-            // Role-based redirection
-            if (user.role === 'admin') {
-                navigate('/dashboard');
-            } else if (user.role === 'teacher') {
-                navigate('/dashboard'); // Currently using same dashboard, can be changed if tutor dashboard is added
-            } else {
-                navigate('/dashboard');
-            }
+            // Fetch settings for the logged-in tenant
+            await fetchSettings();
+
+            // Show Splash Screen
+            setShowSplash(true);
+
+            // Navigation happens in onSplashFinish
         } catch (err) {
             if (err.response && err.response.status === 401) {
                 setError('Invalid username or password.');
@@ -45,10 +48,24 @@ export default function LoginPage() {
                 setError('An error occurred. Please try again later.');
             }
             console.error('Login error:', err);
-        } finally {
             setLoading(false);
         }
     };
+
+    const handleSplashFinish = () => {
+        const role = localStorage.getItem('role');
+        if (role === 'admin') {
+            navigate('/dashboard');
+        } else if (role === 'teacher') {
+            navigate('/dashboard');
+        } else {
+            navigate('/dashboard');
+        }
+    };
+
+    if (showSplash) {
+        return <SplashScreen onFinish={handleSplashFinish} />;
+    }
 
     return (
         <div className="min-h-screen bg-[#e8e9eb] flex items-center justify-center p-4 fixed inset-0 overflow-hidden">

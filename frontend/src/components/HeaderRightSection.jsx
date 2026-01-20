@@ -3,12 +3,17 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, ChevronDown } from 'lucide-react';
 // src/components/HeaderRightSection.jsx
-import { useProfile } from '../hooks/useProfile'; // Correct
+import { useSettings } from '../context/SettingsContext';
 
 const HeaderRightSection = ({ notificationCount = 0, onNotificationClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const { profile } = useProfile(); // Get latest name & avatar
+  const { settings } = useSettings();
+
+  const profile = {
+    full_name: settings.admin.fullname,
+    avatar_url: settings.admin.profile_photo_url || 'https://via.placeholder.com/40?text=U'
+  };
 
   const toggleDropdown = () => setIsDropdownOpen((v) => !v);
 
@@ -45,9 +50,10 @@ const HeaderRightSection = ({ notificationCount = 0, onNotificationClick }) => {
               className="w-full h-full object-cover"
             />
           </div>
-          <span className="text-sm font-medium text-gray-900">
-            {profile.full_name}
-          </span>
+          <div className="text-left hidden md:block">
+            <p className="text-sm font-medium text-gray-900">{profile.full_name}</p>
+            <p className="text-xs text-gray-500 capitalize">{settings.admin.role || 'Admin'}</p>
+          </div>
           <ChevronDown
             className={`w-4 h-4 text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''
               }`}

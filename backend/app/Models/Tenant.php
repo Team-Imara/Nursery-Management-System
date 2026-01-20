@@ -16,6 +16,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return [
             'id',
             'data',
+            'nursery_name',
+            'nursery_logo',
+            'nursery_address',
+            'nursery_contact',
+            'nursery_email',
         ];
     }
 }
