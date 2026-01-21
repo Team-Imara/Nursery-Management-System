@@ -2,8 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { DownloadIcon, CheckIcon, XIcon } from '@heroicons/react/outline';
 import { Search } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
-import HeaderRightSection from '../components/HeaderRightSection';
+import Layout from './Layout.jsx';
 
 // ---------------------------------------------------------------------
 // Hard-coded data (replace later with API)
@@ -109,7 +108,7 @@ const ManageLeaveRequests = () => {
       const isThisMonth =
         dateFilter !== 'This Month' ||
         (requestDate.getMonth() === now.getMonth() &&
-         requestDate.getFullYear() === now.getFullYear());
+          requestDate.getFullYear() === now.getFullYear());
 
       return matchesSearch && matchesTab && matchesType && isThisMonth;
     });
@@ -188,186 +187,168 @@ const ManageLeaveRequests = () => {
   // Render
   // -----------------------------------------------------------------
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar />
+    <Layout>
+      {/* Page Content */}
+      <main className="flex-1 p-8 overflow-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Manage Leave Requests</h1>
 
-      {/* Main Content Area */}
-      <div className="flex-1 ml-64 flex flex-col">
-        {/* Top Header with Right Section */}
-        <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-          <div className="flex justify-end">
-            <HeaderRightSection
-              notificationCount={3}
-              imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
-              name="Admin"
-              onNotificationClick={() => alert('Notifications clicked!')}
+        {/* Search & Filters */}
+        <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex flex-wrap items-center gap-3">
+          <div className="flex-1 min-w-[200px] relative">
+            <input
+              type="text"
+              placeholder="Search by teacher or reason"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
             />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
-        </header>
+          <select
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}
+          >
+            <option value="All">Type: All</option>
+            <option value="Half-day">Half-day</option>
+            <option value="Full-day">Full-day</option>
+            <option value="Multi-day">Multi-day</option>
+          </select>
+          <select
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={dateFilter}
+            onChange={e => setDateFilter(e.target.value)}
+          >
+            <option>This Month</option>
+            <option>Last Month</option>
+            <option>This Year</option>
+          </select>
+        </div>
 
-        {/* Page Content */}
-        <main className="flex-1 p-8 overflow-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Manage Leave Requests</h1>
-
-          {/* Search & Filters */}
-          <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex flex-wrap items-center gap-3">
-            <div className="flex-1 min-w-[200px] relative">
-              <input
-                type="text"
-                placeholder="Search by teacher or reason"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            </div>
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              value={typeFilter}
-              onChange={e => setTypeFilter(e.target.value)}
-            >
-              <option value="All">Type: All</option>
-              <option value="Half-day">Half-day</option>
-              <option value="Full-day">Full-day</option>
-              <option value="Multi-day">Multi-day</option>
-            </select>
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              value={dateFilter}
-              onChange={e => setDateFilter(e.target.value)}
-            >
-              <option>This Month</option>
-              <option>Last Month</option>
-              <option>This Year</option>
-            </select>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex space-x-1 mb-4">
-            {['pending', 'approved', 'rejected'].map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`px-4 py-2 rounded-t-lg font-medium transition-colors
+        {/* Tabs */}
+        <div className="flex space-x-1 mb-4">
+          {['pending', 'approved', 'rejected'].map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-4 py-2 rounded-t-lg font-medium transition-colors
                   ${tab === t ? 'bg-indigo-700 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-          </div>
+            >
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
+        </div>
 
-          {/* Table */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left">
+        {/* Table */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.length === filtered.length && filtered.length > 0}
+                    onChange={selectAll}
+                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teacher</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filtered.map(r => (
+                <tr key={r.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
                     <input
                       type="checkbox"
-                      checked={selectedIds.length === filtered.length && filtered.length > 0}
-                      onChange={selectAll}
+                      checked={selectedIds.includes(r.id)}
+                      onChange={() => toggleSelect(r.id)}
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teacher</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filtered.map(r => (
-                  <tr key={r.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(r.id)}
-                        onChange={() => toggleSelect(r.id)}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap flex items-center">
-                      <img src={r.teacher.avatar} alt={r.teacher.name} className="w-10 h-10 rounded-full mr-3" />
-                      <span className="font-medium">{r.teacher.name}</span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{r.reason}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{r.type}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{r.dates}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{r.submittedAt}</td>
-                    <td className="px-6 py-4 text-sm">
-                      {r.status === 'pending' ? (
-                        <>
-                          <button
-                            onClick={() => handleStatus(r.id, 'approved')}
-                            className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium hover:bg-green-200 flex items-center"
-                          >
-                            <CheckIcon className="w-4 h-4 mr-1" />
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleStatus(r.id, 'rejected')}
-                            className="ml-2 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium hover:bg-red-200 flex items-center"
-                          >
-                            <XIcon className="w-4 h-4 mr-1" />
-                            Reject
-                          </button>
-                        </>
-                      ) : (
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium
-                            ${r.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap flex items-center">
+                    <img src={r.teacher.avatar} alt={r.teacher.name} className="w-10 h-10 rounded-full mr-3" />
+                    <span className="font-medium">{r.teacher.name}</span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{r.reason}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{r.type}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{r.dates}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{r.submittedAt}</td>
+                  <td className="px-6 py-4 text-sm">
+                    {r.status === 'pending' ? (
+                      <>
+                        <button
+                          onClick={() => handleStatus(r.id, 'approved')}
+                          className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium hover:bg-green-200 flex items-center"
                         >
-                          {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <CheckIcon className="w-4 h-4 mr-1" />
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleStatus(r.id, 'rejected')}
+                          className="ml-2 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium hover:bg-red-200 flex items-center"
+                        >
+                          <XIcon className="w-4 h-4 mr-1" />
+                          Reject
+                        </button>
+                      </>
+                    ) : (
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium
+                            ${r.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                      >
+                        {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Summary + Actions */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex space-x-6">
+            <div className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-medium">
+              Pending <span className="ml-1">{summary.pending}</span>
+            </div>
+            <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-medium">
+              Approved (This month) <span className="ml-1">{summary.approved}</span>
+            </div>
+            <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-medium">
+              Rejected <span className="ml-1">{summary.rejected}</span>
+            </div>
           </div>
 
-          {/* Summary + Actions */}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex space-x-6">
-              <div className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-medium">
-                Pending <span className="ml-1">{summary.pending}</span>
-              </div>
-              <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-medium">
-                Approved (This month) <span className="ml-1">{summary.approved}</span>
-              </div>
-              <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-medium">
-                Rejected <span className="ml-1">{summary.rejected}</span>
-              </div>
-            </div>
-
-            <div className="flex space-x-2">
-              <button
-                onClick={exportCSV}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium flex items-center"
-              >
-                <DownloadIcon className="w-4 h-4 mr-1" />
-                Export
-              </button>
-              <button
-                onClick={handleBulkApprove}
-                disabled={!selectedIds.length}
-                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center
+          <div className="flex space-x-2">
+            <button
+              onClick={exportCSV}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium flex items-center"
+            >
+              <DownloadIcon className="w-4 h-4 mr-1" />
+              Export
+            </button>
+            <button
+              onClick={handleBulkApprove}
+              disabled={!selectedIds.length}
+              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center
                   ${selectedIds.length
-                    ? 'bg-indigo-700 text-white hover:bg-indigo-800'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-              >
-                Bulk Approve
-              </button>
-            </div>
+                  ? 'bg-indigo-700 text-white hover:bg-indigo-800'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+            >
+              Bulk Approve
+            </button>
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+      </main>
+    </Layout>
   );
 };
 
