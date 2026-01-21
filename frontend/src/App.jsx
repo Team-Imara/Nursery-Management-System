@@ -9,6 +9,8 @@ import ProfilePage from './layout/ProfilePage';
 import SettingsPage from './layout/SettingsPage';
 import ClassManagement from './layout/ClassManagement.jsx';
 import AddNewClass from './layout/AddNewClass.jsx';
+import ClassDetail from './layout/ClassDetail.jsx';
+import EditClass from './layout/EditClass.jsx';
 import ViewTimetable from './layout/ViewTimetable.jsx';
 import Students from './layout/Students.jsx';
 import StudentDetail from './layout/StudentDetail.jsx';
@@ -54,7 +56,6 @@ function App() {
                         <Route path="/meal-plan" element={<MealPlan />} />
                         <Route path="/student-health" element={<StudentHealth />} />
                         <Route path="/daily-meal" element={<DailyMeal />} />
-
                     </Routes>
                 </Router>
             </SettingsProvider>
