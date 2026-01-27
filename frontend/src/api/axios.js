@@ -29,7 +29,7 @@ instance.interceptors.response.use(
             localStorage.removeItem('role');
             localStorage.removeItem('user');
             // Redirect to login if not already there
-            if (!window.location.pathname.startsWith('/')) {
+            if (window.location.pathname !== '/') {
                 window.location.href = '/';
             }
         }
