@@ -16,7 +16,7 @@ class Classes extends BaseTenantModel
 
     public function assistantTeachers()
     {
-        return $this->belongsToMany(User::class, 'class_teacher');
+        return $this->belongsToMany(User::class, 'class_teacher', 'class_id', 'teacher_id');
     }
 
     public function students()

@@ -128,7 +128,7 @@ const Sidebar = () => {
             </aside>
 
             {/* CSS to hide scrollbar */}
-            <style jsx>{`
+            <style>{`
                 .scrollbar-hide::-webkit-scrollbar {
                     display: none;
                 }
