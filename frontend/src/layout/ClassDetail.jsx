@@ -1,9 +1,9 @@
+// src/pages/ClassDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, User, Users, MapPin, Edit, ArrowLeft, Calendar } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
-import HeaderRightSection from '../components/HeaderRightSection';
 import axios from '../api/axios';
+import Layout from './Layout.jsx';
 
 const ClassDetail = () => {
     const { id } = useParams();
@@ -28,159 +28,186 @@ const ClassDetail = () => {
         fetchClassDetails();
     }, [id]);
 
+    const headerContent = (
+        <div className="flex items-center justify-between w-full">
+            <button
+                onClick={() => navigate('/class-management')}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+                <ArrowLeft size={20} />
+                Back to Classes
+            </button>
+            <button
+                onClick={() => navigate(`/class/edit/${id}`)}
+                className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm font-medium"
+            >
+                <Edit size={18} />
+                Edit Class
+            </button>
+        </div>
+    );
+
     if (loading) {
-        return <div className="flex h-screen items-center justify-center">Loading...</div>;
+        return (
+            <Layout>
+                <div className="flex h-64 items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
+            </Layout>
+        );
     }
 
     if (error || !classData) {
         return (
-            <div className="flex h-screen items-center justify-center flex-col gap-4">
-                <div className="text-red-500">{error || "Class not found"}</div>
-                <button onClick={() => navigate('/class-management')} className="text-blue-500 underline">
-                    Back to Classes
-                </button>
-            </div>
+            <Layout headerContent={headerContent}>
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="p-4 bg-red-50 text-red-600 rounded-full mb-4">
+                        <X size={40} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">{error || "Class not found"}</h2>
+                    <button
+                        onClick={() => navigate('/class-management')}
+                        className="mt-6 text-indigo-600 font-semibold hover:underline"
+                    >
+                        Return to class list
+                    </button>
+                </div>
+            </Layout>
         );
     }
 
     const teacherName = classData.head_teacher?.fullname || classData.headTeacher?.fullname || 'Not Assigned';
-    const teacherAvatar = classData.head_teacher?.avatar || classData.headTeacher?.avatar || 'https://via.placeholder.com/150';
+    const teacherAvatar = classData.head_teacher?.avatar || classData.headTeacher?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(teacherName)}&background=random`;
     const enrolledCount = classData.total_students || 0;
 
     return (
-        <div className="flex h-screen bg-gray-50">
-            <Sidebar />
-            <div className="flex-1 ml-64 flex flex-col">
-                <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
-                    <div className="flex justify-end">
-                        <HeaderRightSection
-                            notificationCount={3}
-                            imageSrc="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg"
-                            name="Admin"
-                        />
-                    </div>
-                </header>
-
-                <main className="flex-1 p-8 overflow-auto">
-                    <button
-                        onClick={() => navigate('/class-management')}
-                        className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-                    >
-                        <ArrowLeft size={20} className="mr-2" />
-                        Back to Classes
-                    </button>
-
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        {/* Header Banner */}
-                        <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600 relative">
-                            <div className="absolute -bottom-10 left-8">
-                                <div className="w-20 h-20 bg-white rounded-full p-1 shadow-lg">
-                                    <div className="w-full h-full rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold">
+        <Layout headerContent={headerContent}>
+            <main className="flex-1 p-8 overflow-auto">
+                <div className="max-w-6xl mx-auto space-y-8">
+                    {/* Hero Section */}
+                    <div className="relative bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="h-40 bg-gradient-to-r from-indigo-600 to-indigo-800"></div>
+                        <div className="px-8 pb-8">
+                            <div className="relative -top-12 flex flex-col md:flex-row md:items-end gap-6">
+                                <div className="w-32 h-32 bg-white rounded-3xl p-2 shadow-xl">
+                                    <div className="w-full h-full rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-5xl font-black">
                                         {classData.classname?.charAt(0) || 'C'}
                                     </div>
                                 </div>
-                            </div>
-                            <div className="absolute top-4 right-4">
-                                <button
-                                    onClick={() => navigate(`/class/edit/${classData.id}`)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-all"
-                                >
-                                    <Edit size={18} />
-                                    Edit Class
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="pt-14 px-8 pb-8">
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">{classData.classname}</h1>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                {/* Left Column: Stats & Info */}
-                                <div className="space-y-6">
-                                    <div className="bg-gray-50 rounded-lg p-6">
-                                        <h3 className="font-semibold text-gray-900 mb-4">Class Overview</h3>
-                                        <div className="space-y-4">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Total Capacity</span>
-                                                <span className="font-medium">{classData.capacity} Students</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Currently Enrolled</span>
-                                                <span className="font-medium">{enrolledCount} Students</span>
-                                            </div>
-                                            <div className="w-full bg-gray-200 h-2 rounded-full mt-2">
-                                                <div
-                                                    className="bg-indigo-600 h-2 rounded-full"
-                                                    style={{ width: `${(enrolledCount / classData.capacity) * 100}%` }}
-                                                />
-                                            </div>
-                                        </div>
+                                <div className="md:mb-2">
+                                    <h1 className="text-4xl font-bold text-gray-900">{classData.classname}</h1>
+                                    <div className="flex items-center gap-4 mt-2 text-gray-500 font-medium">
+                                        <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                                            Room {classData.room || 'N/A'}
+                                        </span>
+                                        <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                                            Age {classData.ageGroup || '4-6'} yrs
+                                        </span>
                                     </div>
+                                </div>
+                            </div>
 
-                                    <div className="bg-blue-50 rounded-lg p-6 border border-blue-100">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <img
-                                                src={teacherAvatar}
-                                                alt={teacherName}
-                                                className="w-12 h-12 rounded-full border-2 border-white shadow-sm"
-                                            />
-                                            <div>
-                                                <h4 className="font-medium text-gray-900">{teacherName}</h4>
-                                                <p className="text-sm text-blue-600">Class Teacher</p>
-                                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                                <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
+                                    <p className="text-sm font-bold text-indigo-400 uppercase tracking-wider mb-1">Lead Teacher</p>
+                                    <div className="flex items-center gap-3">
+                                        <img src={teacherAvatar} className="w-12 h-12 rounded-full border-2 border-white shadow-sm" alt={teacherName} />
+                                        <div>
+                                            <h4 className="font-bold text-gray-900">{teacherName}</h4>
+                                            <p className="text-xs text-indigo-600 font-medium">Head Teacher</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Right Column: Timetable */}
-                                <div className="lg:col-span-2">
-                                    <div className="bg-white border border-gray-200 rounded-lg p-6 h-full">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-2 bg-pink-100 text-pink-600 rounded-lg">
-                                                <Calendar size={24} />
-                                            </div>
-                                            <h2 className="text-xl font-bold text-gray-900">Weekly Timetable</h2>
+                                <div className="p-6 bg-amber-50 rounded-2xl border border-amber-100">
+                                    <p className="text-sm font-bold text-amber-500 uppercase tracking-wider mb-1">Enrollment</p>
+                                    <div className="flex items-end justify-between">
+                                        <div>
+                                            <h4 className="text-2xl font-bold text-gray-900">{enrolledCount} / {classData.capacity}</h4>
+                                            <p className="text-xs text-amber-600 font-medium">Students Enrolled</p>
                                         </div>
-
-                                        <div className="grid grid-cols-5 gap-2 mb-4 text-center text-sm font-medium text-gray-500">
-                                            <div>Mon</div>
-                                            <div>Tue</div>
-                                            <div>Wed</div>
-                                            <div>Thu</div>
-                                            <div>Fri</div>
+                                        <div className="w-24 h-2 bg-amber-200 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-amber-500 rounded-full"
+                                                style={{ width: `${Math.min(100, (enrolledCount / classData.capacity) * 100)}%` }}
+                                            ></div>
                                         </div>
+                                    </div>
+                                </div>
 
-                                        <div className="space-y-3">
-                                            {/* Mock Timetable Rows - Frontend Only for now */}
-                                            {['08:00 AM', '10:00 AM', '12:00 PM'].map((time, i) => (
-                                                <div key={i} className="flex items-center text-sm">
-                                                    <div className="w-20 font-medium text-gray-400">{time}</div>
-                                                    <div className="flex-1 grid grid-cols-5 gap-2">
-                                                        {[1, 2, 3, 4, 5].map(j => (
-                                                            <div key={j} className={`p-2 rounded text-center text-xs ${(i + j) % 3 === 0 ? 'bg-indigo-50 text-indigo-700' :
-                                                                (i + j) % 2 === 0 ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700'
-                                                                }`}>
-                                                                {(i + j) % 3 === 0 ? 'Math' : (i + j) % 2 === 0 ? 'Art' : 'Play'}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
+                                <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                    <p className="text-sm font-bold text-emerald-500 uppercase tracking-wider mb-1">Schedule</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-white rounded-lg text-emerald-600 shadow-sm">
+                                            <Calendar size={20} />
                                         </div>
-
-                                        <div className="mt-6 text-center">
-                                            <button className="text-indigo-600 font-medium hover:text-indigo-800 text-sm">
-                                                View Full Schedule
-                                            </button>
+                                        <div>
+                                            <h4 className="font-bold text-gray-900">Mon - Fri</h4>
+                                            <p className="text-xs text-emerald-600 font-medium">08:00 AM - 01:00 PM</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </main>
-            </div>
-        </div>
+
+                    {/* Timetable Section */}
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                                <Clock className="text-indigo-600" />
+                                Class Weekly Schedule
+                            </h2>
+                            <button
+                                onClick={() => navigate(`/ViewTimetable?class=${id}`)}
+                                className="text-indigo-600 font-bold text-sm hover:underline"
+                            >
+                                Manage Full Timetable
+                            </button>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="text-left text-sm font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
+                                        <th className="pb-4 pr-8">Time</th>
+                                        <th className="pb-4 px-4">Mon</th>
+                                        <th className="pb-4 px-4">Tue</th>
+                                        <th className="pb-4 px-4">Wed</th>
+                                        <th className="pb-4 px-4">Thu</th>
+                                        <th className="pb-4 px-4">Fri</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {[
+                                        { time: '08:00 - 09:30', subjects: ['Math', 'Art', 'Play', 'Science', 'Story'] },
+                                        { time: '09:30 - 10:00', subjects: ['Snack', 'Snack', 'Snack', 'Snack', 'Snack'], type: 'break' },
+                                        { time: '10:00 - 11:30', subjects: ['Garden', 'Math', 'Art', 'Play', 'Science'] },
+                                        { time: '11:30 - 13:00', subjects: ['Story', 'Garden', 'Math', 'Art', 'Play'] },
+                                    ].map((row, i) => (
+                                        <tr key={i} className="group">
+                                            <td className="py-4 pr-8 font-bold text-gray-500 text-sm whitespace-nowrap">{row.time}</td>
+                                            {row.subjects.map((sub, j) => (
+                                                <td key={j} className="py-4 px-2">
+                                                    <div className={`
+                            px-4 py-3 rounded-2xl text-sm font-bold text-center transition-all
+                            ${row.type === 'break'
+                                                            ? 'bg-amber-50 text-amber-600'
+                                                            : (i + j) % 2 === 0 ? 'bg-indigo-50 text-indigo-700' : 'bg-gray-50 text-gray-600'}
+                          `}>
+                                                        {sub}
+                                                    </div>
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </Layout>
     );
 };
 

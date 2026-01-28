@@ -42,9 +42,12 @@ function App() {
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/settings" element={<SettingsPage />} />
                         <Route path="/class-management" element={<ClassManagement />} />
+                        <Route path="/class/:id" element={<ClassDetail />} />
+                        <Route path="/class/edit/:id" element={<EditClass />} />
                         <Route path="/AddNewClass" element={<AddNewClass />} />
                         <Route path="/ViewTimetable" element={<ViewTimetable />} />
                         <Route path="/reports" element={<Report />} />
+                        <Route path="/status" element={<Report />} />
                         <Route path="/students" element={<Students />} />
                         {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
                         <Route path="/students/detail" element={<StudentDetail />} />
