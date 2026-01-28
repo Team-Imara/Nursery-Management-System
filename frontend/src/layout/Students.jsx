@@ -61,10 +61,10 @@ const Students = () => {
 
   const filteredStudents = students.filter((s) => {
     const matchesSearch =
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.fullname || s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.guardian.toLowerCase().includes(searchTerm.toLowerCase());
+      (s.guardian || s.father_name || s.mother_name || s.guardian_name || '').toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesClass = classFilter === 'All' || s.class === classFilter;
     const matchesStatus = statusFilter === 'All' || s.status === statusFilter;

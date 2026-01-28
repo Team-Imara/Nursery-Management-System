@@ -21,20 +21,19 @@ const StudentCard = ({ student, onSelect }) => {
 
         <div className="flex flex-col justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900 text-lg">{student.name}</h3>
-            <p className="text-sm text-gray-600 mb-1">{student.class} • {student.section}</p>
-            <p className="text-sm text-gray-600 mb-1">Guardian: {student.guardian}</p>
+            <h3 className="font-semibold text-gray-900 text-lg">{student.fullname || student.name}</h3>
+            <p className="text-sm text-gray-600 mb-1">{student.classe?.classname || student.class} • {student.section}</p>
+
           </div>
 
           {/* Status */}
           <p
-            className={`mt-2 font-semibold ${
-              student.status === 'Present'
-                ? 'text-green-600'
-                : student.status === 'Absent'
+            className={`mt-2 font-semibold ${student.status === 'Present'
+              ? 'text-green-600'
+              : student.status === 'Absent'
                 ? 'text-red-600'
                 : 'text-gray-600'
-            }`}
+              }`}
           >
             {student.status}
           </p>
