@@ -31,6 +31,29 @@ class TimetableController extends Controller
         return response()->json($timetable);
     }
 
+    public function sync(Request $request, $classId)
+    {
+        $validated = $request->validate([
+            'timetable' => 'required|array',
+            'timetable.*.day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday',
+            'timetable.*.time_slot' => 'required|string',
+            'timetable.*.activity' => 'required|string',
+        ]);
+
+        \App\Models\Timetable::where('class_id', $classId)->delete();
+
+        foreach ($validated['timetable'] as $item) {
+            \App\Models\Timetable::create([
+                'class_id' => $classId,
+                'day' => $item['day'],
+                'time_slot' => $item['time_slot'],
+                'activity' => $item['activity'],
+            ]);
+        }
+
+        return response()->json(['message' => 'Timetable synced successfully']);
+    }
+
     public function update(Request $request, $id)
     {
         $timetable = Timetable::findOrFail($id);

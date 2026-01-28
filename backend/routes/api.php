@@ -88,6 +88,7 @@ Route::middleware(['auth:api', 'tenancy'])->group(function () {
 
     // Timetable Management
     Route::get('timetables/{classId}', [TimetableController::class, 'index']);
+    Route::post('timetables/sync/{classId}', [TimetableController::class, 'sync']);
     Route::post('timetables', [TimetableController::class, 'store']);
     Route::get('timetables/show/{id}', [TimetableController::class, 'show']);
     Route::put('timetables/{id}', [TimetableController::class, 'update']);

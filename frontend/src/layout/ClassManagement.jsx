@@ -93,7 +93,6 @@ const ClassManagement = () => {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Class Management</h1>
-            <p className="text-gray-500 mt-1">Manage nursery classes, teachers, and student capacity.</p>
           </div>
           <button
             onClick={() => navigate('/AddNewClass')}
@@ -110,37 +109,6 @@ const ClassManagement = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white p-4 rounded-xl shadow-sm mb-8 flex flex-wrap gap-4 items-center border border-gray-100"
         >
-          <div className="flex-1 min-w-[300px] relative">
-            <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by class name or head teacher..."
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">Filter By Capacity:</span>
-            <select
-              className="px-4 py-2.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              value={capacityFilter}
-              onChange={e => setCapacityFilter(e.target.value)}
-            >
-              <option value="All">All Capacities</option>
-              <option value="Full">Full (At capacity)</option>
-              <option value="Available">Available Space</option>
-            </select>
-          </div>
-
-          <button
-            onClick={() => navigate('/ViewTimetable')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition shadow-sm font-medium"
-          >
-            <Table size={18} />
-            Global Timetable
-          </button>
         </motion.div>
 
         {error && (
@@ -193,15 +161,6 @@ const ClassManagement = () => {
                           <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
                             {cls.classname}
                           </h3>
-                          <div className="flex items-center gap-4 mt-1">
-                            <span className="text-sm font-medium text-gray-500 flex items-center gap-1">
-                              Room: {cls.room || 'N/A'}
-                            </span>
-                            <span className="text-sm font-medium text-gray-400">•</span>
-                            <span className="text-sm font-medium text-gray-500">
-                              Age: {cls.ageGroup || '4-6'} yrs
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </div>

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Download, Edit, Save, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
+import axios from '../api/axios';
 import Layout from './Layout.jsx';
 
 const ViewTimetable = () => {
@@ -15,54 +16,87 @@ const ViewTimetable = () => {
   const [classInfo, setClassInfo] = useState(null);
   const [allClasses, setAllClasses] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const DAY_MAP = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday' };
+  const REVERSE_DAY_MAP = { 'Monday': 'mon', 'Tuesday': 'tue', 'Wednesday': 'wed', 'Thursday': 'thu', 'Friday': 'fri' };
 
   // Load all classes once
   useEffect(() => {
-    const savedClasses = JSON.parse(localStorage.getItem('nursery-classes') || '[]');
-    setAllClasses(savedClasses);
-  }, []);
+    const fetchAllClasses = async () => {
+      try {
+        const response = await axios.get('/classes');
+        setAllClasses(response.data);
 
-  // Sync URL → selected class
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const classId = params.get('class');
-    if (classId && !isNaN(classId)) {
-      setSelectedClassId(parseInt(classId));
-    } else if (allClasses.length > 0) {
-      // Default to first class if no ?class
-      const firstId = allClasses[0].id;
-      setSelectedClassId(firstId);
-      navigate(`/classes/timetable?class=${firstId}`, { replace: true });
-    }
-  }, [location.search, allClasses, navigate]);
+        const params = new URLSearchParams(location.search);
+        let classId = params.get('class');
+
+        if (classId && !isNaN(classId)) {
+          setSelectedClassId(parseInt(classId));
+        } else if (response.data.length > 0) {
+          const firstId = response.data[0].id;
+          setSelectedClassId(firstId);
+          navigate(`/ViewTimetable?class=${firstId}`, { replace: true });
+        }
+      } catch (err) {
+        console.error('Error fetching classes:', err);
+        setError('Failed to load classes.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllClasses();
+  }, [location.search, navigate]);
 
   // Load timetable when selectedClassId changes
   useEffect(() => {
-    if (!selectedClassId) return;
+    if (!selectedClassId || allClasses.length === 0) return;
 
     const currentClass = allClasses.find(c => c.id === selectedClassId);
     if (!currentClass) return;
 
     setClassInfo(currentClass);
-
-    const savedTimetables = JSON.parse(localStorage.getItem('nursery-timetables') || '{}');
-    const saved = savedTimetables[selectedClassId];
-
-    if (saved) {
-      setTimetable(saved);
-    } else {
-      const defaultTemplate = generateDefaultTemplate();
-      setTimetable(defaultTemplate);
-      savedTimetables[selectedClassId] = defaultTemplate;
-      localStorage.setItem('nursery-timetables', JSON.stringify(savedTimetables));
-    }
+    fetchTimetable(selectedClassId);
   }, [selectedClassId, allClasses]);
+
+  const fetchTimetable = async (classId) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`/timetables/${classId}`);
+
+      if (response.data && response.data.length > 0) {
+        // Transform backend data to frontend grid structure
+        const template = generateDefaultTemplate();
+        response.data.forEach(item => {
+          const slot = template.find(s => s.time === item.time_slot);
+          const dayKey = REVERSE_DAY_MAP[item.day];
+          if (slot && dayKey) {
+            const [title, ...rest] = item.activity.split('|');
+            slot.days[dayKey] = {
+              title: title || '',
+              desc: rest.join('|') || ''
+            };
+          }
+        });
+        setTimetable(template);
+      } else {
+        setTimetable(generateDefaultTemplate());
+      }
+    } catch (err) {
+      console.error('Error fetching timetable:', err);
+      setError('Failed to load timetable.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handle class selection
   const handleClassChange = (e) => {
     const newId = parseInt(e.target.value);
     setSelectedClassId(newId);
-    navigate(`/classes/timetable?class=${newId}`);
+    navigate(`/ViewTimetable?class=${newId}`);
   };
 
   // Generate default template
@@ -77,19 +111,44 @@ const ViewTimetable = () => {
   ];
 
   // Save timetable
-  const saveTimetable = () => {
+  const saveTimetable = async () => {
     if (!selectedClassId) return;
-    const savedTimetables = JSON.parse(localStorage.getItem('nursery-timetables') || '{}');
-    savedTimetables[selectedClassId] = timetable;
-    localStorage.setItem('nursery-timetables', JSON.stringify(savedTimetables));
-    setIsEditing(false);
+
+    // Transform grid back to flat array for backend
+    const flatTimetable = [];
+    timetable.forEach(slot => {
+      Object.entries(slot.days).forEach(([dayKey, activity]) => {
+        flatTimetable.push({
+          day: DAY_MAP[dayKey],
+          time_slot: slot.time,
+          activity: `${activity.title}|${activity.desc}`
+        });
+      });
+    });
+
+    try {
+      setLoading(true);
+      await axios.post(`/timetables/sync/${selectedClassId}`, {
+        timetable: flatTimetable
+      });
+      setIsEditing(false);
+      alert('Timetable saved successfully!');
+    } catch (err) {
+      console.error('Error saving timetable:', err);
+      alert('Failed to save timetable.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Update cell
   const updateCell = (timeIndex, day, field, value) => {
     setTimetable(prev => {
       const updated = [...prev];
-      updated[timeIndex].days[day][field] = value;
+      updated[timeIndex].days[day] = {
+        ...updated[timeIndex].days[day],
+        [field]: value
+      };
       return updated;
     });
   };
@@ -97,10 +156,18 @@ const ViewTimetable = () => {
   // Export PDF
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
-    documentTitle: `${classInfo?.name || 'Timetable'}`,
+    documentTitle: `${classInfo?.classname || 'Timetable'}`,
   });
 
-  if (allClasses.length === 0) {
+  if (loading && allClasses.length === 0) return (
+    <Layout>
+      <div className="flex h-64 items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    </Layout>
+  );
+
+  if (!loading && allClasses.length === 0) {
     return (
       <Layout>
         <div className="p-8">
@@ -124,7 +191,7 @@ const ViewTimetable = () => {
           >
             {allClasses.map(cls => (
               <option key={cls.id} value={cls.id}>
-                {cls.name} • Room {cls.room}
+                {cls.classname} • Room {cls.room || 'N/A'}
               </option>
             ))}
           </select>
@@ -135,9 +202,11 @@ const ViewTimetable = () => {
           {classInfo && (
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900 print:text-xl">
-                {classInfo.name} • Room {classInfo.room} • Age {classInfo.ageGroup}
+                {classInfo.classname} • Room {classInfo.room || 'N/A'} • Age {classInfo.ageGroup || '4-6'}
               </h1>
-              <p className="text-sm text-gray-600 mt-1">Teacher: {classInfo.teacher.name}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Teacher: {classInfo.head_teacher?.fullname || classInfo.headTeacher?.fullname || 'Unassigned'}
+              </p>
             </div>
           )}
 
