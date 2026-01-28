@@ -6,12 +6,21 @@ namespace App\Models;
 class Classes extends BaseTenantModel
 {
     protected $fillable = [
-        'classname', 'capacity', 'total_students', 'head_teacher_id', 'tenant_id'
+        'classname', 'capacity', 'total_students', 'head_teacher_id', 'class_incharge_id', 'sections', 'tenant_id'
+    ];
+
+    protected $casts = [
+        'sections' => 'array',
     ];
 
     public function headTeacher()
     {
         return $this->belongsTo(User::class, 'head_teacher_id');
+    }
+
+    public function classIncharge()
+    {
+        return $this->belongsTo(User::class, 'class_incharge_id');
     }
 
     public function assistantTeachers()
