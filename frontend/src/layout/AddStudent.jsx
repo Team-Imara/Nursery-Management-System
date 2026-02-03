@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 import axios from '../api/axios';
 
 const AddStudent = () => {

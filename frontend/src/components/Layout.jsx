@@ -1,5 +1,5 @@
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
+import Sidebar from './Sidebar';
+import Header from './Header';
 
 const Layout = ({ children, headerContent }) => {
     return (

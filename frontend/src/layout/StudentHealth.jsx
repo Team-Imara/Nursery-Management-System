@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { motion } from 'framer-motion';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 const StudentHealth = () => {
   const { students, updateStudentHealth, addStudent } = useAppContext();

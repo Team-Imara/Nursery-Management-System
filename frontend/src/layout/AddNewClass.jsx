@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, X, ArrowLeft, Save } from 'lucide-react';
 import axios from '../api/axios';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 const AddNewClass = () => {
   const navigate = useNavigate();

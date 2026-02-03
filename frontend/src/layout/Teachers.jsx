@@ -5,7 +5,7 @@ import { Search, Plus, Calendar } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TeacherCard from '../components/TeacherCard';
 import WeeklyAttendanceSummary from '../components/WeeklyAttendanceSummary';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 const Teachers = () => {
   const [teachers, setTeachers] = useState([

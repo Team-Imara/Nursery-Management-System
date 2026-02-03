@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Pencil, X, Save, Camera } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 export default function ProfilePage() {
   const { settings, updateAdminSettings } = useSettings();

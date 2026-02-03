@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import Layout from "./Layout.jsx";
+import Layout from "../components/Layout.jsx";
 
 const StudentDetail = () => {
   const navigate = useNavigate();

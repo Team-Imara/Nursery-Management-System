@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Layout from "./Layout.jsx";
+import Layout from "../components/Layout.jsx";
 
 const EventDetail = () => {
   const { state } = useLocation();

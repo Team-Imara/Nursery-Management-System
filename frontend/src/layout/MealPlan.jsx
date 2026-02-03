@@ -4,7 +4,7 @@ import MealPlanForm from '../components/MealplanForm';
 import { UserPlus, BriefcaseMedical, FileBarChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Utensils } from 'lucide-react';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 /* -------------------------------------------------
    Animation variants
@@ -182,8 +182,8 @@ function StudentTrackingLog() {
             <button
               key={filter}
               className={`px-4 py-2 text-sm rounded-md font-medium ${filter === 'All Students'
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                ? 'bg-slate-800 text-white'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                 }`}
             >
               {filter}
@@ -228,8 +228,8 @@ function StudentTrackingLog() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
                     className={`px-4 py-2 text-sm font-medium rounded-md ${student.status === 'risk'
-                        ? 'bg-slate-800 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-slate-800 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                   >
                     {student.action}

@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Download, Edit, Save, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
-import axios from '../api/axios';
 import Layout from './Layout.jsx';
 
 const ViewTimetable = () => {

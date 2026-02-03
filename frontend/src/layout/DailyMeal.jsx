@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 export default function DailyMeals() {
   const { students, mealRecords, addMealRecord, updateMealRecord } = useAppContext();

@@ -5,7 +5,7 @@ import ReportSummary from '../components/ReportSummary';
 import GradesTable from '../components/GradesTable';
 import BehaviorTable from '../components/BehaviorTable';
 import FiltersPanel from '../components/FiltersPanel';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 
 export default function Reports() {
