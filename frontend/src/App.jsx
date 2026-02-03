@@ -3,7 +3,7 @@ import Teachers from './layout/Teachers.jsx';
 import TeacherDetail from './layout/TeacherDetail.jsx';
 import AddTeacher from './layout/AddTeacher.jsx';
 import ManageLeaveRequests from './layout/ManageLeaveRequests.jsx';
-import Dashboard from "./layout/Dashboard.jsx";
+import Dashboard from "./Dashboard/AdminDashboard.jsx";
 import LoginPage from "./layout/LoginPage.jsx";
 import ProfilePage from './layout/ProfilePage';
 import SettingsPage from './layout/SettingsPage';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 const AddTeacher = () => {
   const navigate = useNavigate();

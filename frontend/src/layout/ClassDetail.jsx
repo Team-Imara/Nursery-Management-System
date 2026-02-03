@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, User, Users, MapPin, Edit, ArrowLeft, Calendar } from 'lucide-react';
 import axios from '../api/axios';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 const ClassDetail = () => {
     const { id } = useParams();

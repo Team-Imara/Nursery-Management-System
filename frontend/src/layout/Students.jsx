@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import StudentCard from '../components/StudentCard';
 import WeeklyAttendanceSummary from '../components/WeeklyAttendanceSummary';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 const Students = () => {
   const [students, setStudents] = useState([

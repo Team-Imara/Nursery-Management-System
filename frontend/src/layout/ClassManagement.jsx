@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Search, Plus, Trash2, Table, Clock, Edit, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from '../api/axios';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 const containerVariants = {
   hidden: { opacity: 0 },

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, Home, Palette, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSettings } from '../context/SettingsContext';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 export default function SettingsPage() {
   const navigate = useNavigate();

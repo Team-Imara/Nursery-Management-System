@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { DownloadIcon, CheckIcon, XIcon } from '@heroicons/react/outline';
 import { Search } from 'lucide-react';
-import Layout from './Layout.jsx';
+import Layout from '../components/Layout.jsx';
 
 // ---------------------------------------------------------------------
 // Hard-coded data (replace later with API)
