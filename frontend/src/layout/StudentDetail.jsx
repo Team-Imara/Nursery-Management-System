@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Edit } from "lucide-react";
 import { motion } from "framer-motion";
 import Layout from "../components/Layout.jsx";
 
@@ -37,13 +37,21 @@ const StudentDetail = () => {
   };
 
   const headerContent = (
-    <div className="flex items-center justify-start">
+    <div className="flex items-center justify-between w-full">
       <button
         onClick={() => navigate("/students")}
         className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
       >
         <ArrowLeft size={20} />
         Back to Students
+      </button>
+
+      <button
+        onClick={() => navigate(`/students/edit/${displayStudent.id}`, { state: { student: displayStudent } })}
+        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        <Edit size={18} />
+        Edit Student
       </button>
     </div>
   );

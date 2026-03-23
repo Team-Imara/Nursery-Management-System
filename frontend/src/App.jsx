@@ -15,6 +15,7 @@ import ViewTimetable from './layout/ViewTimetable.jsx';
 import Students from './layout/Students.jsx';
 import StudentDetail from './layout/StudentDetail.jsx';
 import AddStudent from './layout/AddStudent.jsx';
+import EditStudent from './layout/EditStudent.jsx';
 import SendMessage from './components/SendMessage.jsx';
 import EventManagement from './layout/EventManagement';
 import EventDetail from './layout/EventDetail.jsx';
@@ -52,6 +53,7 @@ function App() {
                         {/* <Route path="/student/:id" element={<StudentDetail />} /> */}
                         <Route path="/students/detail" element={<StudentDetail />} />
                         <Route path="/add-student" element={<AddStudent />} />
+                        <Route path="/students/edit/:id" element={<EditStudent />} />
                         <Route path="/send-message" element={<SendMessage />} />
                         <Route path="/event-management" element={<EventManagement />} />
                         <Route path="/event/:date" element={<EventDetail />} />

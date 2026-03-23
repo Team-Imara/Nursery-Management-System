@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Layout from '../components/Layout.jsx';
 import axios from '../api/axios';
 
-const AddStudent = () => {
+const EditStudent = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const location = useLocation();
 
+    // Initial state
     const [formData, setFormData] = useState({
         fullname: '',
         name_with_initials: '',
@@ -33,9 +36,9 @@ const AddStudent = () => {
         guardian_address: '',
         class_id: '',
         section: '',
-        academic_year: new Date().getFullYear().toString(),
-        end_year: (new Date().getFullYear() + 1).toString(),
-        enrollment_date: new Date().toISOString().split('T')[0],
+        academic_year: '',
+        end_year: '',
+        enrollment_date: '',
         assessment_reading: '',
         assessment_writing: '',
         assessment_numbers: '',
@@ -46,7 +49,6 @@ const AddStudent = () => {
         assessment_notes: '',
         status: 'Active',
         image: '',
-        // Missing fields added
         uniform_details: '',
         favourite_toys: '',
         emergency_contact_name: '',
@@ -60,26 +62,60 @@ const AddStudent = () => {
 
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [fetchingClasses, setFetchingClasses] = useState(true);
+    const [fetchingData, setFetchingData] = useState(true);
     const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchClasses = async () => {
-            try {
-                const response = await axios.get('/classes');
-                setClasses(response.data);
-            } catch (err) {
-                console.error('Error fetching classes:', err);
-                setError('Failed to load classes. Please try again.');
-            } finally {
-                setFetchingClasses(false);
-            }
-        };
-        fetchClasses();
-    }, []);
-
     const [previewImage, setPreviewImage] = useState(null);
     const [showPreview, setShowPreview] = useState(false);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                // Fetch Classes
+                const classesResponse = await axios.get('/classes');
+                setClasses(classesResponse.data);
+
+                // Fetch Student Data
+                let studentData = location.state?.student;
+                if (!studentData && id) {
+                    const response = await axios.get(`/students/${id}`);
+                    studentData = response.data;
+                }
+
+                if (studentData) {
+                    // Map student data to form fields
+                    // Ensure null values are converted to empty strings for controlled inputs
+                    const mappedData = {};
+                    Object.keys(formData).forEach(key => {
+                        mappedData[key] = studentData[key] || '';
+                    });
+
+                    // Handle specific fields if needed
+                    if (studentData.classe && studentData.classe.id) {
+                        mappedData.class_id = studentData.classe.id;
+                    }
+                    // If class_id is directly available
+                    if (studentData.class_id) {
+                        mappedData.class_id = studentData.class_id;
+                    }
+
+                    // Handle date formatting if necessary (backend usually sends YYYY-MM-DD or ISO)
+                    if (mappedData.dob) mappedData.dob = mappedData.dob.split('T')[0];
+                    if (mappedData.enrollment_date) mappedData.enrollment_date = mappedData.enrollment_date.split('T')[0];
+
+                    setFormData(mappedData);
+                    if (studentData.image) {
+                        setPreviewImage(studentData.image);
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading data:', err);
+                setError('Failed to load student data.');
+            } finally {
+                setFetchingData(false);
+            }
+        };
+        loadData();
+    }, [id, location.state]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -106,13 +142,13 @@ const AddStudent = () => {
         setError(null);
 
         try {
-            const response = await axios.post('/students', formData);
+            const response = await axios.put(`/students/${id}`, formData);
 
-            // Navigate to Student page with the new student
-            navigate('/students', { state: { newStudent: response.data } });
+            // Navigate back to Student Detail or Students list
+            navigate('/students', { state: { updatedStudent: response.data } });
         } catch (err) {
-            console.error('Error creating student:', err);
-            setError(err.response?.data?.message || 'Failed to create student. Please check the form.');
+            console.error('Error updating student:', err);
+            setError(err.response?.data?.message || 'Failed to update student.');
         } finally {
             setLoading(false);
         }
@@ -130,16 +166,30 @@ const AddStudent = () => {
         </div>
     );
 
+    if (fetchingData) {
+        return (
+            <Layout headerContent={headerContent}>
+                <div className="flex items-center justify-center h-screen">
+                    <Loader2 className="animate-spin text-blue-600" size={40} />
+                </div>
+            </Layout>
+        );
+    }
+
     return (
         <Layout headerContent={headerContent}>
             <div className="pt-8">
                 <div className="max-w-3xl mx-auto">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-6">Add New Student</h1>
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-3xl font-bold text-gray-900">Edit Student</h1>
+                    </div>
+
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
                             {error}
                         </div>
                     )}
+
                     <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                         {/* Personal Details */}
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">Personal Details</h2>
@@ -264,7 +314,6 @@ const AddStudent = () => {
                         {/* Guardian Details */}
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-semibold text-gray-900">Guardian Details</h2>
-
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -729,10 +778,10 @@ const AddStudent = () => {
                                 {loading ? (
                                     <>
                                         <Loader2 className="animate-spin" size={20} />
-                                        Creating...
+                                        Updating...
                                     </>
                                 ) : (
-                                    'Create Student'
+                                    'Update Student'
                                 )}
                             </button>
                         </div>
@@ -773,9 +822,9 @@ const AddStudent = () => {
                         </div>
                     )}
                 </div>
-            </div >
-        </Layout >
+            </div>
+        </Layout>
     );
 };
 
-export default AddStudent;
+export default EditStudent;
