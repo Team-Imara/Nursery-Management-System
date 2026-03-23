@@ -54,6 +54,17 @@ class StudentController extends Controller
             'assessment_language_sinhala' => 'nullable|string|max:50',
             'assessment_drawing' => 'nullable|string|max:50',
             'assessment_notes' => 'nullable|string',
+
+            // New fields
+            'uniform_details' => 'nullable|string|max:255',
+            'favourite_toys' => 'nullable|string|max:255',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_phone' => 'nullable|string|max:20',
+            'allergies' => 'nullable|string',
+            'height' => 'nullable|numeric',
+            'weight' => 'nullable|numeric',
+            'special_needs' => 'nullable|string',
+            'health_notes' => 'nullable|string',
         ]);
         $student = Student::create($validated);
         return response()->json($student, 201);
@@ -107,6 +118,17 @@ class StudentController extends Controller
             'assessment_language_sinhala' => 'nullable|string|max:50',
             'assessment_drawing' => 'nullable|string|max:50',
             'assessment_notes' => 'nullable|string',
+
+            // New fields
+            'uniform_details' => 'nullable|string|max:255',
+            'favourite_toys' => 'nullable|string|max:255',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_phone' => 'nullable|string|max:20',
+            'allergies' => 'nullable|string',
+            'height' => 'nullable|numeric',
+            'weight' => 'nullable|numeric',
+            'special_needs' => 'nullable|string',
+            'health_notes' => 'nullable|string',
         ]);
         $student->update($validated);
         return response()->json($student);
