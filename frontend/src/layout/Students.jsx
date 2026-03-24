@@ -1,46 +1,18 @@
 // src/pages/Students.jsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Loader2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from '../api/axios';
 
 import StudentCard from '../components/StudentCard';
 import WeeklyAttendanceSummary from '../components/WeeklyAttendanceSummary';
 import Layout from '../components/Layout.jsx';
 
 const Students = () => {
-  const [students, setStudents] = useState([
-    {
-      id: 1,
-      name: 'Aarav Kumar',
-      class: 'KG1',
-      section: 'A',
-      guardian: 'Raj Kumar',
-      status: 'Present',
-      roll: '01',
-      image: 'https://images.pexels.com/photos/414503/pexels-photo-414503.jpeg?auto=compress&cs=tinysrgb&w=150',
-    },
-    {
-      id: 2,
-      name: 'Sara Ali',
-      class: 'KG2',
-      section: 'B',
-      guardian: 'Amina Ali',
-      status: 'Present',
-      roll: '02',
-      image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150',
-    },
-    {
-      id: 3,
-      name: 'Adam Perera',
-      class: 'KG1',
-      section: 'A',
-      guardian: 'Rashid Perera',
-      status: 'Absent',
-      roll: '03',
-      image: 'https://images.pexels.com/photos/35537/child-children-girl-happy.jpg?auto=compress&cs=tinysrgb&w=150',
-    },
-  ]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [classFilter, setClassFilter] = useState('All');
@@ -48,25 +20,36 @@ const Students = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const newStudent = location.state?.newStudent;
+
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get('/students');
+      setStudents(response.data);
+    } catch (err) {
+      console.error('Error fetching students:', err);
+      setError('Failed to fetch students. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (newStudent) {
-      setStudents((prev) => [
-        ...prev,
-        { ...newStudent, id: prev.length + 1 },
-      ]);
-    }
-  }, [newStudent]);
+    fetchStudents();
+  }, []);
 
   const filteredStudents = students.filter((s) => {
-    const matchesSearch =
-      (s.fullname || s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (s.guardian || s.father_name || s.mother_name || s.guardian_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const s_fullname = s.fullname || s.name || '';
+    const s_class = s.classe?.classname || s.class || '';
+    const s_section = s.section || '';
+    const s_guardian = (s.guardian || s.father_name || s.mother_name || s.guardian_name || '');
 
-    const matchesClass = classFilter === 'All' || s.class === classFilter;
+    const matchesSearch =
+      s_fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s_class.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s_section.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s_guardian.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesClass = classFilter === 'All' || s_class === classFilter;
     const matchesStatus = statusFilter === 'All' || s.status === statusFilter;
 
     return matchesSearch && matchesClass && matchesStatus;
@@ -109,6 +92,33 @@ const Students = () => {
       ],
     },
   ];
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <Loader2 className="animate-spin text-blue-600 mb-4" size={48} />
+          <p className="text-gray-600 font-medium">Fetching students...</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="text-center py-20">
+          <p className="text-red-500 text-lg font-medium">{error}</p>
+          <button
+            onClick={fetchStudents}
+            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </Layout>
+    );
+  }
 
   // Overview Stats
   const totalStudents = students.length;
@@ -196,9 +206,9 @@ const Students = () => {
           className="px-5 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
         >
           <option value="All">All Classes</option>
-          <option value="KG1">KG1</option>
-          <option value="KG2">KG2</option>
-          <option value="Grade 1">Grade 1</option>
+          {Array.from(new Set(students.map(s => s.classe?.classname || s.class))).filter(Boolean).map(className => (
+            <option key={className} value={className}>{className}</option>
+          ))}
         </select>
 
         <select

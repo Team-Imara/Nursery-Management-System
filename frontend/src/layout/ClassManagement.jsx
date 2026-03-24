@@ -1,7 +1,7 @@
 // src/pages/ClassManagement.jsx
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Plus, Trash2, Table, Clock, Edit, Users } from 'lucide-react';
+import { Search, Plus, Trash2, Table, Clock, Edit, Users, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from '../api/axios';
 import Layout from '../components/Layout.jsx';
@@ -103,13 +103,6 @@ const ClassManagement = () => {
           </button>
         </div>
 
-        {/* Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-4 rounded-xl shadow-sm mb-8 flex flex-wrap gap-4 items-center border border-gray-100"
-        >
-        </motion.div>
 
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 flex items-center justify-between">
@@ -155,11 +148,11 @@ const ClassManagement = () => {
                     <div className="flex-1 min-w-[200px]">
                       <div className="flex items-center gap-3">
                         <div className="p-2.5 bg-indigo-50 rounded-lg text-indigo-600">
-                          <Users size={24} />
+                          <Building2 size={24} />
                         </div>
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                            {cls.classname}
+                            {cls.classname} - {cls.sections}
                           </h3>
                         </div>
                       </div>
