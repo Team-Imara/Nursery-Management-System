@@ -79,11 +79,14 @@ class ReportController extends Controller
 
     public function classPerformanceSummary(Request $request, $classId)
     {
-        $class = Classes::findOrFail($classId);
-        $observations = Observation::whereIn('student_id', $class->students->pluck('id'))
+        $singleClass = Classes::findOrFail($classId);
+        $observations = Observation::whereIn('student_id', $singleClass->students->pluck('id'))
             ->whereBetween('date', [$request->start, $request->end])->get();
         // Aggregates
-        $pdf = Pdf::loadView('reports.class_performance_summary', compact('class', 'observations'));
+        $pdf = Pdf::loadView('reports.class_performance_summary', [
+            'singleClass' => $singleClass,
+            'observations' => $observations
+        ]);
         return $pdf->download('class_performance_summary_report.pdf');
     }
 }
