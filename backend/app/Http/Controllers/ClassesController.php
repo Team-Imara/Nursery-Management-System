@@ -41,10 +41,10 @@ class ClassesController extends Controller
         }
 
         $validated['tenant_id'] = tenant('id');
-        
+
         \Log::info('Creating class with validated data', $validated);
         $classes = Classes::create($validated);
-        
+
         if ($request->has('assistant_teacher_ids') && !empty($request->assistant_teacher_ids)) {
             \Log::info('Syncing assistant teachers', ['ids' => $request->assistant_teacher_ids]);
             $syncData = [];
@@ -53,7 +53,7 @@ class ClassesController extends Controller
             }
             $classes->assistantTeachers()->attach($syncData);
         }
-        
+
         $classes->load(['headTeacher', 'classIncharge', 'assistantTeachers']);
         \Log::info('Class created successfully', ['id' => $classes->id, 'head_teacher' => $classes->headTeacher->fullname ?? 'None']);
 
