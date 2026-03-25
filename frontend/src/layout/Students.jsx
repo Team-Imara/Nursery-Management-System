@@ -209,7 +209,7 @@ const Students = () => {
   return (
     <Layout>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Students</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Students</h1>
         <button
           onClick={() => navigate('/add-student')}
           className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition font-medium shadow-md"
@@ -340,9 +340,9 @@ const Students = () => {
               variants={cardVariants}
               exit="exit"
             >
-              <StudentCard 
-                student={student} 
-                onSelect={() => navigate(`/student/${student.id}`)} 
+              <StudentCard
+                student={student}
+                onSelect={() => navigate(`/student/${student.id}`)}
               />
             </motion.div>
           ))}
@@ -416,8 +416,8 @@ const Students = () => {
                         <button
                           onClick={() => toggleStudentStatus(student.id)}
                           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all ${student.status === 'present'
-                              ? 'bg-green-600 text-white shadow-lg shadow-green-100'
-                              : 'bg-white border-2 border-gray-100 text-gray-400 hover:border-green-200'
+                            ? 'bg-green-600 text-white shadow-lg shadow-green-100'
+                            : 'bg-white border-2 border-gray-100 text-gray-400 hover:border-green-200'
                             }`}
                         >
                           <Check size={18} />
@@ -426,8 +426,8 @@ const Students = () => {
                         <button
                           onClick={() => toggleStudentStatus(student.id)}
                           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all ${student.status === 'absent'
-                              ? 'bg-red-600 text-white shadow-lg shadow-red-100'
-                              : 'bg-white border-2 border-gray-100 text-gray-400 hover:border-red-200'
+                            ? 'bg-red-600 text-white shadow-lg shadow-red-100'
+                            : 'bg-white border-2 border-gray-100 text-gray-400 hover:border-red-200'
                             }`}
                         >
                           <X size={18} />

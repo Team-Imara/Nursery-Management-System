@@ -76,7 +76,7 @@ const WeeklyAttendanceSummary = ({
           <tbody className="bg-white divide-y divide-gray-100">
             {data.map((row, index) => (
               <tr
-                key={row.className || row.name || index}
+                key={`${row.id}-${row.className}-${row.sections || index}`}
                 className="hover:bg-gray-50 transition-colors duration-150"
               >
                 <td className="px-6 py-5 font-semibold text-gray-800 whitespace-nowrap">
