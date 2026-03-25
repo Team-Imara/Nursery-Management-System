@@ -7,6 +7,9 @@ const WeeklyAttendanceSummary = ({
   data = [],
   loading = false,
   className = "",
+  sections = [],
+  onCellClick = null,
+  onTitleClick = null,
 }) => {
   // Loading state
   if (loading) {
@@ -38,10 +41,13 @@ const WeeklyAttendanceSummary = ({
     <div className={`bg-white rounded-xl shadow-sm border border-gray-200 mb-8 ${className}`}>
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-gray-900">{title}</h3>
-          <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-            {type === "teacher" ? "Teachers" : "Students"}
-          </span>
+          <h3
+            className={`text-xl font-bold text-gray-900 ${onTitleClick ? 'cursor-pointer hover:text-blue-600 transition' : ''}`}
+            onClick={onTitleClick}
+          >
+            {title}
+          </h3>
+
         </div>
       </div>
 
@@ -74,7 +80,18 @@ const WeeklyAttendanceSummary = ({
                 className="hover:bg-gray-50 transition-colors duration-150"
               >
                 <td className="px-6 py-5 font-semibold text-gray-800 whitespace-nowrap">
-                  {row.className || row.name || row.teacherName || "—"}
+                  {row.className ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-900">{row.className}</span>
+                      {row.sections && row.sections !== 'No Section' && (
+                        <span className="font-semibold text-gray-800 whitespace-nowrap border-blue-100 uppercase tracking-tight">
+                          - {row.sections}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    row.name || row.teacherName || "—"
+                  )}
                 </td>
                 {row.days.map((day, i) => {
                   const value = day.percentage;
@@ -84,15 +101,15 @@ const WeeklyAttendanceSummary = ({
                   return (
                     <td
                       key={i}
-                      className={`px-6 py-5 text-center font-bold text-lg ${
-                        isEmpty
-                          ? "text-gray-400"
-                          : num < 90
+                      onClick={() => onCellClick?.(row, day)}
+                      className={`px-6 py-5 text-center font-bold text-lg cursor-pointer hover:bg-opacity-80 transition ${isEmpty
+                        ? "text-gray-400"
+                        : num < 90
                           ? "text-red-600 bg-red-50"
                           : num >= 95
-                          ? "text-green-600 bg-green-50"
-                          : "text-gray-700"
-                      }`}
+                            ? "text-green-600 bg-green-50"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
                     >
                       {isEmpty ? "—" : value}
                     </td>

@@ -95,6 +95,11 @@ Route::middleware(['auth:api', 'tenancy'])->group(function () {
     Route::delete('timetables/{id}', [TimetableController::class, 'destroy']);
 
     // Attendance (FR1.2)
+    Route::get('attendances/get-weekly-summary', [AttendanceController::class, 'getWeeklySummary']);
+    Route::get('attendances/get-overall-summary', [AttendanceController::class, 'getOverallSummary']);
+    Route::get('attendances/get-students-for-attendance', [AttendanceController::class, 'getStudentsForAttendance']);
+    Route::post('attendances/bulk-store', [AttendanceController::class, 'bulkStore']);
+
     Route::get('attendances', [AttendanceController::class, 'index']); // With optional ?studentId= or ?classId=
     Route::post('attendances', [AttendanceController::class, 'store']);
     Route::get('attendances/{id}', [AttendanceController::class, 'show']);
