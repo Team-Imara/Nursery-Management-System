@@ -576,33 +576,34 @@ const EditStudent = () => {
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">Class & Enrollment</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Class & Section</label>
                                 <select
-                                    name="class_id"
+                                    name="class_and_section"
                                     required
-                                    value={formData.class_id}
-                                    onChange={handleChange}
+                                    value={`${formData.class_id}|${formData.section}`}
+                                    onChange={(e) => {
+                                        const [classId, section] = e.target.value.split('|');
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            class_id: classId || '',
+                                            section: section || ''
+                                        }));
+                                    }}
                                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     disabled={fetchingData}
                                 >
-                                    <option value="">Select class</option>
-                                    {classes.map((cls) => (
-                                        <option key={cls.id} value={cls.id}>
-                                            {cls.classname}
-                                        </option>
-                                    ))}
+                                    <option value="|">Select class</option>
+                                    {classes.flatMap(cls => {
+                                        if (!cls.sections || cls.sections.length === 0) {
+                                            return [<option key={cls.id} value={`${cls.id}|`}>{cls.classname}</option>];
+                                        }
+                                        return cls.sections.map(sec => (
+                                            <option key={`${cls.id}-${sec}`} value={`${cls.id}|${sec}`}>
+                                                {cls.classname} - {sec}
+                                            </option>
+                                        ));
+                                    })}
                                 </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                                <input
-                                    type="text"
-                                    name="section"
-                                    value={formData.section}
-                                    onChange={handleChange}
-                                    placeholder="A / B / C"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year (Start)</label>
