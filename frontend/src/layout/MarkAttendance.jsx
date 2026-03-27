@@ -104,7 +104,7 @@ const MarkAttendance = () => {
                     className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 transition-colors group"
                 >
                     <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium">Back to Students</span>
+                    <span className="font-semibold text-sm">Back to Students</span>
                 </button>
 
                 {/* Page Header - Leave Request Style */}

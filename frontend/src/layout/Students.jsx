@@ -1,7 +1,7 @@
 // src/pages/Students.jsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Loader2, Check, X, Filter, Calendar, Users, Info, Save } from 'lucide-react';
+import { Search, Plus, Loader2, Check, X, Filter, Calendar, Users, Info, Save, Star } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 
@@ -142,13 +142,22 @@ const Students = () => {
     <Layout>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Students</h1>
-        <button
-          onClick={() => navigate('/add-student')}
-          className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition font-medium shadow-md"
-        >
-          <Plus size={20} />
-          Add Student
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/skill-records')}
+            className="flex items-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition font-medium shadow-sm"
+          >
+            <Star size={20} className="text-yellow-500" />
+            Skill Records
+          </button>
+          <button
+            onClick={() => navigate('/add-student')}
+            className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition font-medium shadow-md"
+          >
+            <Plus size={20} />
+            Add Student
+          </button>
+        </div>
       </div>
 
       {/* Overview Cards */}

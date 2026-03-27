@@ -7,9 +7,19 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Student::with('classe')->get());
+        $query = Student::with('classe');
+
+        if ($request->has('class_id')) {
+            $query->where('class_id', $request->class_id);
+        }
+
+        if ($request->has('section')) {
+            $query->where('section', $request->section);
+        }
+
+        return response()->json($query->get());
     }
 
     public function store(Request $request)
