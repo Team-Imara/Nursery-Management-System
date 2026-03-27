@@ -144,15 +144,7 @@ const StudentAttendanceManagement = () => {
         animate: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } }
     };
 
-    if (loading) {
-        return (
-            <Layout>
-                <div className="flex items-center justify-center h-[60vh]">
-                    <Loader2 className="animate-spin text-indigo-600" size={40} />
-                </div>
-            </Layout>
-        );
-    }
+
 
     return (
         <Layout>
