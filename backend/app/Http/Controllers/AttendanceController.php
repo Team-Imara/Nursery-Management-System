@@ -154,27 +154,20 @@ class AttendanceController extends Controller
 
     public function getOverallSummary(Request $request)
     {
-        $today = now()->toDateString();
-        $startOfWeek = now()->startOfWeek()->toDateString();
-        $startOfMonth = now()->startOfMonth()->toDateString();
-
         $totalStudents = Student::count();
+        $maleStudents = Student::where('gender', 'male')->count();
+        $femaleStudents = Student::where('gender', 'female')->count();
 
-        $presentToday = Attendance::where('attendance_date', $today)
-            ->whereIn('status', ['present', 'late'])
-            ->count();
-
-        $absentToday = Attendance::where('attendance_date', $today)
-            ->where('status', 'absent')
-            ->count();
-
-        // Weekly/Monthly stats can be more complex, but for now just counts
+        // Calculate Last Week's Stats (Previous complete week Mon to Sun)
+        $startOfLastWeek = now()->subWeek()->startOfWeek()->toDateString();
+        $endOfLastWeek = now()->subWeek()->endOfWeek()->toDateString();
+        
+        // Also calculate monthly for reference if needed, but last_week_avg is what's requested
         return response()->json([
             'total' => $totalStudents,
-            'present_today' => $presentToday,
-            'absent_today' => $absentToday,
-            'weekly_avg' => $this->calculateAvgAttendance($startOfWeek, $today),
-            'monthly_avg' => $this->calculateAvgAttendance($startOfMonth, $today)
+            'male_students' => $maleStudents,
+            'female_students' => $femaleStudents,
+            'last_week_avg' => $this->calculateAvgAttendance($startOfLastWeek, $endOfLastWeek)
         ]);
     }
 
