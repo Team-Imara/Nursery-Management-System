@@ -159,8 +159,8 @@ const Students = () => {
         animate="animate"
       >
         <motion.div variants={cardVariants} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center gap-4 mb-3 text-blue-600">
-            <div className="p-3 bg-blue-50 rounded-xl"><Users size={24} /></div>
+          <div className="flex items-center gap-4 mb-3 text-green-600">
+            <div className="p-3 bg-green-50 rounded-xl"><Users size={24} /></div>
             <p className="text-gray-500 text-xs font-semibold">Total Students</p>
           </div>
           <p className="text-2xl font-bold text-gray-900">{totalStudents}</p>
@@ -194,17 +194,6 @@ const Students = () => {
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Weekly Performance</h2>
-        <div className="flex bg-gray-100 p-1 rounded-xl">
-          {['Today', 'This Week', 'This Month'].map(filter => (
-            <button
-              key={filter}
-              onClick={() => setTimeFilter(filter)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition ${timeFilter === filter ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
       </div>
 
       <motion.div
