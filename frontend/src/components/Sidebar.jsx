@@ -16,10 +16,11 @@ import {
 } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 
-const NavItem = ({ icon, label, to }) => {
+const NavItem = ({ icon, label, to, onClick }) => {
     return (
         <NavLink
             to={to}
+            onClick={onClick}
             className={({ isActive }) =>
                 `w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-200 rounded-lg ${isActive
                     ? 'bg-white/10 text-white border-l-4 border-blue-400'
@@ -33,14 +34,50 @@ const NavItem = ({ icon, label, to }) => {
     );
 };
 
+const SubNavItem = ({ label, to }) => {
+    return (
+        <NavLink
+            to={to}
+            className={({ isActive }) =>
+                `w-full flex items-center gap-3 pl-12 pr-4 py-2 text-[11px] font-bold uppercase tracking-widest transition-all duration-200 rounded-lg ${isActive
+                    ? 'text-blue-400 bg-white/5'
+                    : 'text-gray-500 hover:text-white hover:bg-white/5'
+                }`
+            }
+        >
+            <div className={`w-1 h-1 rounded-full bg-current`}></div>
+            <span>{label}</span>
+        </NavLink>
+    );
+};
+
+import { useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+
 const Sidebar = () => {
     const { settings } = useSettings();
+    const { pathname } = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    
+    // Automatically expand if current route is student-related
+    const isStudentsActive = pathname.startsWith('/students') || 
+                            pathname.startsWith('/attendance') || 
+                            pathname.startsWith('/skill-records') ||
+                            pathname.startsWith('/student/');
 
     const mainNavItems = [
         { icon: <LayoutDashboard size={20} />, label: 'Dashboard', to: '/dashboard' },
         { icon: <GraduationCap size={20} />, label: 'Teachers', to: '/teachers' },
-        { icon: <Users size={20} />, label: 'Students', to: '/students' },
+        { 
+            icon: <Users size={20} />, 
+            label: 'Students', 
+            to: '/students',
+            isExpandable: true,
+            subItems: [
+                { label: 'Attendance', to: '/attendance/manage' },
+                { label: 'Skill Records', to: '/skill-records' }
+            ]
+        },
         { icon: <BookOpen size={20} />, label: 'Classes', to: '/class-management' },
         // { icon: <Calendar size={20} />, label: 'Events & Calendar', to: '/events' },
         // { icon: <BookOpen size={20} />, label: 'Classes', to: '/classes' },
@@ -67,7 +104,7 @@ const Sidebar = () => {
             >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-
+ 
             {/* Overlay for mobile */}
             {isMobileMenuOpen && (
                 <div
@@ -103,12 +140,31 @@ const Sidebar = () => {
                         </p>
                         <div className="space-y-1">
                             {mainNavItems.map((item) => (
-                                <NavItem
-                                    key={item.label}
-                                    icon={item.icon}
-                                    label={item.label}
-                                    to={item.to}
-                                />
+                                <div key={item.label}>
+                                    <NavItem
+                                        icon={item.icon}
+                                        label={item.label}
+                                        to={item.to}
+                                    />
+                                    <AnimatePresence>
+                                        {item.subItems && isStudentsActive && (
+                                            <motion.div 
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                className="mt-1 space-y-1 overflow-hidden"
+                                            >
+                                                {item.subItems.map((sub) => (
+                                                    <SubNavItem
+                                                        key={sub.label}
+                                                        label={sub.label}
+                                                        to={sub.to}
+                                                    />
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             ))}
                         </div>
                     </div>
