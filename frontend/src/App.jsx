@@ -24,6 +24,7 @@ import StudentHealth from "./layout/StudentHealth.jsx";
 import DailyMeal from "./layout/DailyMeal.jsx";
 import Report from './layout/Report.jsx';
 import MarkAttendance from './layout/MarkAttendance.jsx';
+import StudentAttendanceManagement from './layout/StudentAttendanceManagement.jsx';
 import { AppProvider } from './context/AppContext';
 
 
@@ -64,6 +65,7 @@ function App() {
                         <Route path="/daily-meal" element={<DailyMeal />} />
                         <Route path="/attendance/mark/:classId/:date" element={<MarkAttendance />} />
                         <Route path="/attendance/mark/:classId/:date/:section" element={<MarkAttendance />} />
+                        <Route path="/attendance/manage" element={<StudentAttendanceManagement />} />
                     </Routes>
                 </Router>
             </SettingsProvider>

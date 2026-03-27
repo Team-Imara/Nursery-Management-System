@@ -171,6 +171,33 @@ class AttendanceController extends Controller
         ]);
     }
 
+    public function getManagementSummary(Request $request)
+    {
+        $today = now()->toDateString();
+        $startOfWeek = now()->startOfWeek()->toDateString();
+        $startOfMonth = now()->startOfMonth()->toDateString();
+        
+        $totalStudents = Student::count();
+
+        $presentToday = Attendance::where('attendance_date', $today)
+            ->whereIn('status', ['present', 'late'])
+            ->count();
+
+        $absentToday = Attendance::where('attendance_date', $today)
+            ->where('status', 'absent')
+            ->count();
+            
+        $todayPercentage = $totalStudents > 0 ? round(($presentToday / $totalStudents) * 100) . "%" : "0%";
+
+        return response()->json([
+            'present_today' => $presentToday,
+            'absent_today' => $absentToday,
+            'today_percentage' => $todayPercentage,
+            'weekly_avg' => $this->calculateAvgAttendance($startOfWeek, $today),
+            'monthly_avg' => $this->calculateAvgAttendance($startOfMonth, $today)
+        ]);
+    }
+
     private function calculateAvgAttendance($start, $end)
     {
         $totalStudents = Student::count();

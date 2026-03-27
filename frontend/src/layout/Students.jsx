@@ -207,7 +207,7 @@ const Students = () => {
           data={weeklyAttendance}
           loading={loading}
           onCellClick={handleCellClick}
-          onTitleClick={() => fetchData()}
+          onTitleClick={() => navigate('/attendance/manage')}
         />
       </motion.div>
 
