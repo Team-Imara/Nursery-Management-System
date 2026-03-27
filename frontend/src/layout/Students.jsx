@@ -96,16 +96,7 @@ const Students = () => {
     },
   };
 
-  if (loading && students.length === 0) {
-    return (
-      <Layout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="animate-spin text-blue-600 mb-4" size={48} />
-          <p className="text-gray-600 font-medium">Loading Attendance Center...</p>
-        </div>
-      </Layout>
-    );
-  }
+
 
   if (error) {
     return (
@@ -129,9 +120,9 @@ const Students = () => {
 
   // Overview Stats derived from API
   const totalStudents = attendanceStats.total;
-  const presentToday = attendanceStats.present_today;
-  const absentToday = attendanceStats.absent_today;
-  const currentAvg = timeFilter === 'This Week' ? attendanceStats.weekly_avg : (timeFilter === 'This Month' ? attendanceStats.monthly_avg : 'N/A');
+  const maleStudents = attendanceStats.male_students;
+  const femaleStudents = attendanceStats.female_students;
+  const lastWeekAvg = attendanceStats.last_week_avg;
 
   /* -------------------------------------------------
      Framer Motion Variants
@@ -176,28 +167,28 @@ const Students = () => {
         </motion.div>
 
         <motion.div variants={cardVariants} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center gap-4 mb-3 text-green-600">
-            <div className="p-3 bg-green-50 rounded-xl"><Check size={24} /></div>
-            <p className="text-gray-500 text-xs font-semibold">Present Today</p>
+          <div className="flex items-center gap-4 mb-3 text-indigo-600">
+            <div className="p-3 bg-indigo-50 rounded-xl"><Users size={24} /></div>
+            <p className="text-gray-500 text-xs font-semibold">Male Students</p>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{presentToday}</p>
+          <p className="text-2xl font-bold text-gray-900">{maleStudents}</p>
         </motion.div>
 
         <motion.div variants={cardVariants} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center gap-4 mb-3 text-red-600">
-            <div className="p-3 bg-red-50 rounded-xl"><X size={24} /></div>
-            <p className="text-gray-500 text-xs font-semibold">Absent Today</p>
+          <div className="flex items-center gap-4 mb-3 text-rose-600">
+            <div className="p-3 bg-rose-50 rounded-xl"><Users size={24} /></div>
+            <p className="text-gray-500 text-xs font-semibold">Female Students</p>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{absentToday}</p>
+          <p className="text-2xl font-bold text-gray-900">{femaleStudents}</p>
         </motion.div>
 
         <motion.div variants={cardVariants} className="bg-slate-900 text-white rounded-2xl p-6 shadow-lg shadow-slate-200">
           <div className="flex items-center gap-4 mb-3">
             <div className="p-3 bg-slate-800 rounded-xl"><Calendar size={24} /></div>
-            <p className="text-slate-400 text-xs font-semibold">Avg Attendance</p>
+            <p className="text-slate-400 text-xs font-semibold">Last Week Avg</p>
           </div>
-          <p className="text-2xl font-bold text-white">{currentAvg}</p>
-          <p className="text-xs text-slate-500 mt-2 font-medium tracking-wide">Based on {timeFilter} filter</p>
+          <p className="text-2xl font-bold text-white">{lastWeekAvg}</p>
+          <p className="text-xs text-slate-500 mt-2 font-medium tracking-wide">Previous Week Performance</p>
         </motion.div>
       </motion.div>
 
