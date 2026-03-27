@@ -168,7 +168,7 @@ const StudentAttendanceManagement = () => {
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Attendance Center</h1>
+                        <h1 className="text-3xl font-bold text-gray-900">Attendance Center</h1>
                         <p className="text-gray-500 font-semibold mt-1">Manage, view, and update dynamic student attendance records</p>
                     </div>
                 </div>

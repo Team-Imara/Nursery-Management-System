@@ -107,6 +107,10 @@ Route::middleware(['auth:api', 'tenancy'])->group(function () {
     Route::put('attendances/{id}', [AttendanceController::class, 'update']);
     Route::delete('attendances/{id}', [AttendanceController::class, 'destroy']);
 
+    // Skill Records
+    Route::get('skill-records', [\App\Http\Controllers\SkillRecordController::class, 'index']);
+    Route::post('skill-records/bulk-store', [\App\Http\Controllers\SkillRecordController::class, 'bulkStore']);
+
     // Observations (FR2)
     Route::get('observations/{studentId}', [ObservationController::class, 'index']);
     Route::post('observations', [ObservationController::class, 'store']);
