@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Student extends BaseTenantModel
 {
-    use SoftDeletes;
+    use SoftDeletes, Notifiable;
 
     protected $fillable = [
         'fullname', 'name_with_initials', 'calling_name', 'dob', 'gender', 'address', 'academic_year', 'end_year', 'enrollment_date', 'religion', 'uniform_details',
@@ -46,5 +47,24 @@ class Student extends BaseTenantModel
     public function studentMeals()
     {
         return $this->hasMany(StudentMeal::class);
+    }
+
+    public function routeNotificationForNotify_lk($notification)
+    {
+        // Prioritize parent/guardian contacts
+        if (!empty($this->mother_contact)) {
+            return $this->mother_contact;
+        }
+        if (!empty($this->father_contact)) {
+            return $this->father_contact;
+        }
+        if (!empty($this->guardian_contact)) {
+            return $this->guardian_contact;
+        }
+        if (!empty($this->whatsapp_number)) {
+            return $this->whatsapp_number;
+        }
+        
+        return null; // Return null if no contact is available
     }
 }
