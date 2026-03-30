@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout.jsx";
+import axios from "../api/axios";
+import { Loader2 } from "lucide-react";
 
 const EventManagement = () => {
   const navigate = useNavigate();
   // Existing event list
-  const [events, setEvents] = useState([
-    { date: "2025-10-01", title: "Children’s Day", type: "special" },
-    { date: "2025-10-06", title: "Full Moon Poya", type: "holiday" },
-    { date: "2025-10-07", title: "Teacher’s Day", type: "special" },
-    { date: "2025-10-15", title: "Sportsmeet Day", type: "special" },
-    { date: "2025-10-20", title: "Diwali Holiday", type: "holiday" },
-  ]);
+  const [events, setEvents] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   // Month control
-  const [currentMonth, setCurrentMonth] = useState(9);
-  const [currentYear, setCurrentYear] = useState(2025);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   // New event form data
   const [newEvent, setNewEvent] = useState({
@@ -24,12 +23,33 @@ const EventManagement = () => {
     time: "",
     description: "",
     venue: "",
-    audience: "",
+    type: "special",
+    audience: "all",
   });
 
   // Filter and modal state
   const [filter, setFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
+
+  // Fetch events and classes on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [eventsRes, classesRes] = await Promise.all([
+          axios.get('/calendar-events'),
+          axios.get('/classes')
+        ]);
+        setEvents(eventsRes.data);
+        setClasses(classesRes.data);
+      } catch (error) {
+        console.error("Error fetching calendar data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -38,23 +58,41 @@ const EventManagement = () => {
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-  const blanks = (firstDay + 6) % 7;
+  // Fix blanks logic (assuming Monday as first day)
+  const blanks = firstDay === 0 ? 6 : firstDay - 1;
 
-  const handleAddEvent = () => {
-    if (!newEvent.title || !newEvent.date) {
-      alert("Please fill event title and date.");
+  const handleAddEvent = async () => {
+    if (!newEvent.title || !newEvent.date || !newEvent.type || !newEvent.audience) {
+      alert("Please fill in all required fields (Title, Date, Type, Audience).");
       return;
     }
-    setEvents([...events, { ...newEvent, type: "special" }]);
-    setNewEvent({
-      title: "",
-      date: "",
-      time: "",
-      description: "",
-      venue: "",
-      audience: "",
-    });
-    setShowForm(false);
+
+    try {
+      setSaving(true);
+      // Avoid sending empty strings for optional fields
+      const payload = { ...newEvent };
+      if (!payload.time) delete payload.time;
+      if (!payload.description) delete payload.description;
+      if (!payload.venue) delete payload.venue;
+
+      const res = await axios.post('/calendar-events', payload);
+      setEvents([...events, res.data.event]);
+      setNewEvent({
+        title: "",
+        date: "",
+        time: "",
+        description: "",
+        venue: "",
+        type: "special",
+        audience: "all",
+      });
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error creating event:", error);
+      alert("Failed to create event. Please check the console for details.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleMonthChange = (direction) => {
@@ -129,13 +167,6 @@ const EventManagement = () => {
           <h1 className="text-2xl font-bold text-gray-900">
             Interactive Calendar
           </h1>
-
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-medium hover:bg-green-200"
-          >
-            + New Event
-          </button>
         </div>
 
         {/* Grid */}
@@ -224,7 +255,7 @@ const EventManagement = () => {
           {/* Event Editor */}
           <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
             <h2 className="text-lg font-semibold mb-2 text-slate-800">
-              Create / Manage Event
+              Create New Event
             </h2>
 
             <input
@@ -264,6 +295,17 @@ const EventManagement = () => {
               className="border rounded-lg px-3 py-2 text-sm"
             />
 
+            <select
+              value={newEvent.type}
+              onChange={(e) =>
+                setNewEvent({ ...newEvent, type: e.target.value })
+              }
+              className="border rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="special">Special Event</option>
+              <option value="holiday">Holiday</option>
+            </select>
+
             <input
               type="text"
               placeholder="Venue"
@@ -273,15 +315,21 @@ const EventManagement = () => {
               }
               className="border rounded-lg px-3 py-2 text-sm"
             />
-            <input
-              type="text"
-              placeholder="Audience"
+
+            <select
               value={newEvent.audience}
               onChange={(e) =>
                 setNewEvent({ ...newEvent, audience: e.target.value })
               }
               className="border rounded-lg px-3 py-2 text-sm"
-            />
+            >
+              <option value="all">All Classes</option>
+              {classes.map((cls) => (
+                <option key={cls.id} value={cls.id}>
+                  {cls.classname}
+                </option>
+              ))}
+            </select>
 
             <div className="flex gap-2 mt-3">
               <button
@@ -292,9 +340,10 @@ const EventManagement = () => {
               </button>
               <button
                 onClick={handleAddEvent}
-                className="bg-gray-200 text-gray-800 px-3 py-2 rounded-lg hover:bg-gray-300"
+                disabled={saving}
+                className="bg-gray-200 text-gray-800 px-3 py-2 rounded-lg hover:bg-gray-300 flex items-center justify-center min-w-[80px]"
               >
-                Save
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
               </button>
             </div>
           </div>

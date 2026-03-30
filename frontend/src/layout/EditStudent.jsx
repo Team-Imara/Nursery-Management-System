@@ -64,6 +64,10 @@ const EditStudent = () => {
     const [loading, setLoading] = useState(false);
     const [fetchingData, setFetchingData] = useState(true);
     const [error, setError] = useState(null);
+    const [fieldErrors, setFieldErrors] = useState({});
+
+    const getFieldClass = (fieldName) => `w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${fieldErrors[fieldName] ? "border-red-500 bg-red-50" : "border-gray-200"}`;
+
     const [previewImage, setPreviewImage] = useState(null);
     const [showPreview, setShowPreview] = useState(false);
 
@@ -120,6 +124,13 @@ const EditStudent = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => {
+                const newErrs = { ...prev };
+                delete newErrs[name];
+                return newErrs;
+            });
+        }
     };
 
     const handleImageUpload = (e) => {
@@ -140,6 +151,58 @@ const EditStudent = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+
+        // Validation: All fields mandatory
+        const emptyFields = Object.entries(formData).filter(([key, value]) => {
+            if (key === 'image' && !value) return false;
+            if (key === 'created_at' || key === 'updated_at' || key === 'deleted_at' || key === 'classe' || key === 'tenant_id' || key === 'status') return false;
+
+            if (key.startsWith('guardian_') && key !== 'guardian_type' && formData.guardian_type !== 'others') {
+                return false;
+            }
+            if (!value || value.toString().trim() === '') {
+                return true;
+            }
+            return false;
+        });
+
+        let newErrors = {};
+        let hasError = false;
+
+        if (emptyFields.length > 0) {
+            emptyFields.forEach(f => {
+                newErrors[f[0]] = "This field is required";
+            });
+            hasError = true;
+        }
+
+        // Validation: Contact numbers must be exactly 11 digits
+        const contactFields = [
+            { id: 'whatsapp_number', name: 'WhatsApp Number', value: formData.whatsapp_number },
+            { id: 'father_contact', name: 'Father Contact Number', value: formData.father_contact },
+            { id: 'mother_contact', name: 'Mother Contact Number', value: formData.mother_contact },
+            { id: 'emergency_contact_phone', name: 'Emergency Contact Phone', value: formData.emergency_contact_phone }
+        ];
+
+        if (formData.guardian_type === 'others') {
+            contactFields.push({ id: 'guardian_contact', name: 'Guardian Contact Number', value: formData.guardian_contact });
+        }
+
+        const phoneRegex = /^\d{11}$/;
+        for (let contact of contactFields) {
+            if (contact.value && !phoneRegex.test(contact.value)) {
+                newErrors[contact.id] = "Must be exactly 11 digits";
+                hasError = true;
+            }
+        }
+
+        if (hasError) {
+            setFieldErrors(newErrors);
+            setError("Please correct the highlighted fields below.");
+            setLoading(false);
+            return;
+        }
 
         try {
             const response = await axios.put(`/students/${id}`, formData);
@@ -202,8 +265,9 @@ const EditStudent = () => {
                                     required
                                     value={formData.fullname}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("fullname")}
                                 />
+                                {fieldErrors.fullname && <span className="text-xs text-red-500 mt-1 block font-medium">{fieldErrors.fullname}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Name with Initials</label>
@@ -212,8 +276,10 @@ const EditStudent = () => {
                                     name="name_with_initials"
                                     value={formData.name_with_initials}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("name_with_initials")}
                                 />
+                                {fieldErrors.name_with_initials && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.name_with_initials}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Name by which child is called</label>
@@ -222,8 +288,10 @@ const EditStudent = () => {
                                     name="calling_name"
                                     value={formData.calling_name}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("calling_name")}
                                 />
+                                {fieldErrors.calling_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.calling_name}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
@@ -233,8 +301,10 @@ const EditStudent = () => {
                                     required
                                     value={formData.dob}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("dob")}
                                 />
+                                {fieldErrors.dob && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.dob}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
@@ -242,13 +312,14 @@ const EditStudent = () => {
                                     name="gender"
                                     value={formData.gender}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("gender")}
                                 >
                                     <option value="">Select gender</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                     <option value="other">Other</option>
                                 </select>
+                                {fieldErrors.gender && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.gender}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">First Language</label>
@@ -257,8 +328,10 @@ const EditStudent = () => {
                                     name="first_language"
                                     value={formData.first_language}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("first_language")}
                                 />
+                                {fieldErrors.first_language && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.first_language}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Religion</label>
@@ -267,8 +340,10 @@ const EditStudent = () => {
                                     name="religion"
                                     value={formData.religion}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("religion")}
                                 />
+                                {fieldErrors.religion && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.religion}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Uniform Details</label>
@@ -278,8 +353,10 @@ const EditStudent = () => {
                                     value={formData.uniform_details}
                                     onChange={handleChange}
                                     placeholder="Size, etc."
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("uniform_details")}
                                 />
+                                {fieldErrors.uniform_details && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.uniform_details}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Favourite Toy / Activity</label>
@@ -288,8 +365,10 @@ const EditStudent = () => {
                                     name="favourite_toys"
                                     value={formData.favourite_toys}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("favourite_toys")}
                                 />
+                                {fieldErrors.favourite_toys && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.favourite_toys}</span>}
+
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Upload Photo</label>
@@ -324,8 +403,10 @@ const EditStudent = () => {
                                     name="whatsapp_number"
                                     value={formData.whatsapp_number}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("whatsapp_number")}
                                 />
+                                {fieldErrors.whatsapp_number && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.whatsapp_number}</span>}
+
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
@@ -334,8 +415,10 @@ const EditStudent = () => {
                                     rows="2"
                                     value={formData.address}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("address")}
                                 />
+                                {fieldErrors.address && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.address}</span>}
+
                             </div>
 
                             <div className="col-span-2 border-t pt-4 mt-2">
@@ -348,8 +431,10 @@ const EditStudent = () => {
                                     name="father_name"
                                     value={formData.father_name}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("father_name")}
                                 />
+                                {fieldErrors.father_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_name}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Father's Contact Number</label>
@@ -358,8 +443,10 @@ const EditStudent = () => {
                                     name="father_contact"
                                     value={formData.father_contact}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("father_contact")}
                                 />
+                                {fieldErrors.father_contact && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_contact}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Father's Occupation</label>
@@ -368,8 +455,10 @@ const EditStudent = () => {
                                     name="father_occupation"
                                     value={formData.father_occupation}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("father_occupation")}
                                 />
+                                {fieldErrors.father_occupation && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_occupation}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Father's NIC</label>
@@ -378,8 +467,10 @@ const EditStudent = () => {
                                     name="father_nic"
                                     value={formData.father_nic}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("father_nic")}
                                 />
+                                {fieldErrors.father_nic && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_nic}</span>}
+
                             </div>
 
                             <div className="col-span-2 border-t pt-4 mt-2">
@@ -392,8 +483,10 @@ const EditStudent = () => {
                                     name="mother_name"
                                     value={formData.mother_name}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("mother_name")}
                                 />
+                                {fieldErrors.mother_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_name}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Contact Number</label>
@@ -402,8 +495,9 @@ const EditStudent = () => {
                                     name="mother_contact"
                                     value={formData.mother_contact}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("mother_contact")}
                                 />
+                                {fieldErrors.mother_contact && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_contact}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Occupation</label>
@@ -412,8 +506,10 @@ const EditStudent = () => {
                                     name="mother_occupation"
                                     value={formData.mother_occupation}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("mother_occupation")}
                                 />
+                                {fieldErrors.mother_occupation && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_occupation}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Mother's NIC</label>
@@ -422,8 +518,10 @@ const EditStudent = () => {
                                     name="mother_nic"
                                     value={formData.mother_nic}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("mother_nic")}
                                 />
+                                {fieldErrors.mother_nic && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_nic}</span>}
+
                             </div>
                             <div className="flex items-center gap-2">
                                 <label className="text-sm font-medium text-gray-700">Guardian Type:</label>
@@ -437,6 +535,7 @@ const EditStudent = () => {
                                     <option value="mother">Mother</option>
                                     <option value="others">Others</option>
                                 </select>
+                                {fieldErrors.guardian_type && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.guardian_type}</span>}
                             </div>
 
                             {formData.guardian_type === 'others' && (
@@ -451,8 +550,10 @@ const EditStudent = () => {
                                             name="guardian_name"
                                             value={formData.guardian_name}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className={getFieldClass("guardian_name")}
                                         />
+                                        {fieldErrors.guardian_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.guardian_name}</span>}
+
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Guardian Contact Number</label>
@@ -461,8 +562,10 @@ const EditStudent = () => {
                                             name="guardian_contact"
                                             value={formData.guardian_contact}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className={getFieldClass("guardian_contact")}
                                         />
+                                        {fieldErrors.guardian_contact && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.guardian_contact}</span>}
+
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Guardian Occupation</label>
@@ -471,8 +574,10 @@ const EditStudent = () => {
                                             name="guardian_occupation"
                                             value={formData.guardian_occupation}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className={getFieldClass("guardian_occupation")}
                                         />
+                                        {fieldErrors.guardian_occupation && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.guardian_occupation}</span>}
+
                                     </div>
                                     <div className="col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Guardian Address</label>
@@ -481,8 +586,10 @@ const EditStudent = () => {
                                             rows="2"
                                             value={formData.guardian_address}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className={getFieldClass("guardian_address")}
                                         />
+                                        {fieldErrors.guardian_address && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.guardian_address}</span>}
+
                                     </div>
                                 </>
                             )}
@@ -498,8 +605,10 @@ const EditStudent = () => {
                                     name="emergency_contact_name"
                                     value={formData.emergency_contact_name}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("emergency_contact_name")}
                                 />
+                                {fieldErrors.emergency_contact_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.emergency_contact_name}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
@@ -508,8 +617,10 @@ const EditStudent = () => {
                                     name="emergency_contact_phone"
                                     value={formData.emergency_contact_phone}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("emergency_contact_phone")}
                                 />
+                                {fieldErrors.emergency_contact_phone && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.emergency_contact_phone}</span>}
+
                             </div>
                         </div>
 
@@ -524,8 +635,10 @@ const EditStudent = () => {
                                     name="height"
                                     value={formData.height}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("height")}
                                 />
+                                {fieldErrors.height && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.height}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
@@ -535,8 +648,10 @@ const EditStudent = () => {
                                     name="weight"
                                     value={formData.weight}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("weight")}
                                 />
+                                {fieldErrors.weight && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.weight}</span>}
+
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Allergies</label>
@@ -546,8 +661,10 @@ const EditStudent = () => {
                                     value={formData.allergies}
                                     onChange={handleChange}
                                     placeholder="List any allergies..."
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("allergies")}
                                 />
+                                {fieldErrors.allergies && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.allergies}</span>}
+
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Special Needs / Requirements</label>
@@ -556,8 +673,10 @@ const EditStudent = () => {
                                     rows="2"
                                     value={formData.special_needs}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("special_needs")}
                                 />
+                                {fieldErrors.special_needs && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.special_needs}</span>}
+
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Health Notes</label>
@@ -567,8 +686,10 @@ const EditStudent = () => {
                                     value={formData.health_notes}
                                     onChange={handleChange}
                                     placeholder="Any other health related notes..."
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("health_notes")}
                                 />
+                                {fieldErrors.health_notes && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.health_notes}</span>}
+
                             </div>
                         </div>
 
@@ -604,6 +725,7 @@ const EditStudent = () => {
                                         ));
                                     })}
                                 </select>
+                                {fieldErrors.class_and_section && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.class_and_section}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year (Start)</label>
@@ -614,8 +736,10 @@ const EditStudent = () => {
                                     value={formData.academic_year}
                                     onChange={handleChange}
                                     placeholder="e.g., 2024"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("academic_year")}
                                 />
+                                {fieldErrors.academic_year && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.academic_year}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">End Year</label>
@@ -625,8 +749,10 @@ const EditStudent = () => {
                                     value={formData.end_year}
                                     onChange={handleChange}
                                     placeholder="e.g., 2025"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("end_year")}
                                 />
+                                {fieldErrors.end_year && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.end_year}</span>}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Enrollment Date</label>
@@ -635,8 +761,10 @@ const EditStudent = () => {
                                     name="enrollment_date"
                                     value={formData.enrollment_date}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("enrollment_date")}
                                 />
+                                {fieldErrors.enrollment_date && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.enrollment_date}</span>}
+
                             </div>
                         </div>
 
@@ -649,7 +777,7 @@ const EditStudent = () => {
                                     name="assessment_reading"
                                     value={formData.assessment_reading}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("assessment_reading")}
                                 >
                                     <option value="">Select assessment</option>
                                     <option value="Excellent">Excellent</option>
@@ -657,6 +785,7 @@ const EditStudent = () => {
                                     <option value="Good">Good</option>
                                     <option value="Can Improve">Can Improve</option>
                                 </select>
+                                {fieldErrors.assessment_reading && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.assessment_reading}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Writing</label>
@@ -664,7 +793,7 @@ const EditStudent = () => {
                                     name="assessment_writing"
                                     value={formData.assessment_writing}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("assessment_writing")}
                                 >
                                     <option value="">Select assessment</option>
                                     <option value="Excellent">Excellent</option>
@@ -672,6 +801,7 @@ const EditStudent = () => {
                                     <option value="Good">Good</option>
                                     <option value="Can Improve">Can Improve</option>
                                 </select>
+                                {fieldErrors.assessment_writing && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.assessment_writing}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Numbers</label>
@@ -679,7 +809,7 @@ const EditStudent = () => {
                                     name="assessment_numbers"
                                     value={formData.assessment_numbers}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("assessment_numbers")}
                                 >
                                     <option value="">Select assessment</option>
                                     <option value="Excellent">Excellent</option>
@@ -687,6 +817,7 @@ const EditStudent = () => {
                                     <option value="Good">Good</option>
                                     <option value="Can Improve">Can Improve</option>
                                 </select>
+                                {fieldErrors.assessment_numbers && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.assessment_numbers}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Language Skills (Tamil)</label>
@@ -694,7 +825,7 @@ const EditStudent = () => {
                                     name="assessment_language_tamil"
                                     value={formData.assessment_language_tamil}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("assessment_language_tamil")}
                                 >
                                     <option value="">Select assessment</option>
                                     <option value="Excellent">Excellent</option>
@@ -702,6 +833,7 @@ const EditStudent = () => {
                                     <option value="Good">Good</option>
                                     <option value="Can Improve">Can Improve</option>
                                 </select>
+                                {fieldErrors.assessment_language_tamil && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.assessment_language_tamil}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Language Skills (English)</label>
@@ -709,7 +841,7 @@ const EditStudent = () => {
                                     name="assessment_language_english"
                                     value={formData.assessment_language_english}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("assessment_language_english")}
                                 >
                                     <option value="">Select assessment</option>
                                     <option value="Excellent">Excellent</option>
@@ -717,6 +849,7 @@ const EditStudent = () => {
                                     <option value="Good">Good</option>
                                     <option value="Can Improve">Can Improve</option>
                                 </select>
+                                {fieldErrors.assessment_language_english && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.assessment_language_english}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Language Skills (Sinhala)</label>
@@ -724,7 +857,7 @@ const EditStudent = () => {
                                     name="assessment_language_sinhala"
                                     value={formData.assessment_language_sinhala}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("assessment_language_sinhala")}
                                 >
                                     <option value="">Select assessment</option>
                                     <option value="Excellent">Excellent</option>
@@ -732,6 +865,7 @@ const EditStudent = () => {
                                     <option value="Good">Good</option>
                                     <option value="Can Improve">Can Improve</option>
                                 </select>
+                                {fieldErrors.assessment_language_sinhala && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.assessment_language_sinhala}</span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Drawing</label>
@@ -739,7 +873,7 @@ const EditStudent = () => {
                                     name="assessment_drawing"
                                     value={formData.assessment_drawing}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={getFieldClass("assessment_drawing")}
                                 >
                                     <option value="">Select assessment</option>
                                     <option value="Excellent">Excellent</option>
@@ -747,6 +881,7 @@ const EditStudent = () => {
                                     <option value="Good">Good</option>
                                     <option value="Can Improve">Can Improve</option>
                                 </select>
+                                {fieldErrors.assessment_drawing && <span className="text-sm text-red-500 mt-1 block font-medium">{fieldErrors.assessment_drawing}</span>}
                             </div>
                             <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
@@ -758,6 +893,8 @@ const EditStudent = () => {
                                     placeholder="Any additional initial observations..."
                                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
+                                {fieldErrors.assessment_notes && <span className="text-xs text-red-500 mt-1 block font-light">{fieldErrors.assessment_notes}</span>}
+
                             </div>
                         </div>
 
@@ -767,14 +904,14 @@ const EditStudent = () => {
                                 type="button"
                                 onClick={handlePreview}
                                 className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                                disabled={!formData.fullname || !formData.class_id || loading}
+                                disabled={loading}
                             >
                                 Preview
                             </button>
                             <button
                                 type="submit"
                                 className="w-full px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium flex items-center justify-center gap-2"
-                                disabled={!formData.fullname || !formData.class_id || loading}
+                                disabled={loading}
                             >
                                 {loading ? (
                                     <>

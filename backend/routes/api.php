@@ -77,6 +77,10 @@ Route::group([], function () {
 });
 
 Route::middleware(['auth:api', 'tenancy'])->group(function () {
+    // Interactive Calendar Events
+    Route::get('/calendar-events', [App\Http\Controllers\InteractiveCalendarEventController::class, 'index']);
+    Route::post('/calendar-events', [App\Http\Controllers\InteractiveCalendarEventController::class, 'store']);
+
     //Teacher Management
     Route::apiResource('users', UserController::class);
 
