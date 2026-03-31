@@ -278,7 +278,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("name_with_initials")}
                                 />
-                                {fieldErrors.name_with_initials && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.name_with_initials}</span>}
+                                {fieldErrors.name_with_initials && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -290,7 +290,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("calling_name")}
                                 />
-                                {fieldErrors.calling_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.calling_name}</span>}
+                                {fieldErrors.calling_name && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -303,7 +303,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("dob")}
                                 />
-                                {fieldErrors.dob && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.dob}</span>}
+                                {fieldErrors.dob && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -330,7 +330,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("first_language")}
                                 />
-                                {fieldErrors.first_language && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.first_language}</span>}
+                                {fieldErrors.first_language && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -342,7 +342,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("religion")}
                                 />
-                                {fieldErrors.religion && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.religion}</span>}
+                                {fieldErrors.religion && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -355,7 +355,7 @@ const EditStudent = () => {
                                     placeholder="Size, etc."
                                     className={getFieldClass("uniform_details")}
                                 />
-                                {fieldErrors.uniform_details && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.uniform_details}</span>}
+                                {fieldErrors.uniform_details && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -367,7 +367,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("favourite_toys")}
                                 />
-                                {fieldErrors.favourite_toys && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.favourite_toys}</span>}
+                                {fieldErrors.favourite_toys && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div className="col-span-2">
@@ -405,7 +405,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("whatsapp_number")}
                                 />
-                                {fieldErrors.whatsapp_number && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.whatsapp_number}</span>}
+                                {fieldErrors.whatsapp_number && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div className="col-span-2">
@@ -417,7 +417,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("address")}
                                 />
-                                {fieldErrors.address && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.address}</span>}
+                                {fieldErrors.address && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
 
@@ -433,7 +433,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("father_name")}
                                 />
-                                {fieldErrors.father_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_name}</span>}
+                                {fieldErrors.father_name && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -445,7 +445,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("father_contact")}
                                 />
-                                {fieldErrors.father_contact && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_contact}</span>}
+                                {fieldErrors.father_contact && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -457,7 +457,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("father_occupation")}
                                 />
-                                {fieldErrors.father_occupation && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_occupation}</span>}
+                                {fieldErrors.father_occupation && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -469,7 +469,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("father_nic")}
                                 />
-                                {fieldErrors.father_nic && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.father_nic}</span>}
+                                {fieldErrors.father_nic && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
 
@@ -485,7 +485,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("mother_name")}
                                 />
-                                {fieldErrors.mother_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_name}</span>}
+                                {fieldErrors.mother_name && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -497,7 +497,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("mother_contact")}
                                 />
-                                {fieldErrors.mother_contact && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_contact}</span>}
+                                {fieldErrors.mother_contact && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Occupation</label>
@@ -508,7 +508,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("mother_occupation")}
                                 />
-                                {fieldErrors.mother_occupation && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_occupation}</span>}
+                                {fieldErrors.mother_occupation && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div>
@@ -520,7 +520,7 @@ const EditStudent = () => {
                                     onChange={handleChange}
                                     className={getFieldClass("mother_nic")}
                                 />
-                                {fieldErrors.mother_nic && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.mother_nic}</span>}
+                                {fieldErrors.mother_nic && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                             </div>
                             <div className="flex items-center gap-2">
@@ -552,7 +552,7 @@ const EditStudent = () => {
                                             onChange={handleChange}
                                             className={getFieldClass("guardian_name")}
                                         />
-                                        {fieldErrors.guardian_name && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.guardian_name}</span>}
+                                        {fieldErrors.guardian_name && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                                     </div>
                                     <div>
@@ -564,7 +564,7 @@ const EditStudent = () => {
                                             onChange={handleChange}
                                             className={getFieldClass("guardian_contact")}
                                         />
-                                        {fieldErrors.guardian_contact && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.guardian_contact}</span>}
+                                        {fieldErrors.guardian_contact && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                                     </div>
                                     <div>
@@ -576,7 +576,7 @@ const EditStudent = () => {
                                             onChange={handleChange}
                                             className={getFieldClass("guardian_occupation")}
                                         />
-                                        {fieldErrors.guardian_occupation && <span className="text-xs text-red-500 mt-1 block font-normal">{fieldErrors.guardian_occupation}</span>}
+                                        {fieldErrors.guardian_occupation && <span className="text-xs text-red-500 mt-1 block font-normal"></span>}
 
                                     </div>
                                     <div className="col-span-2">
@@ -904,14 +904,14 @@ const EditStudent = () => {
                                 type="button"
                                 onClick={handlePreview}
                                 className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                                disabled={loading}
+                                disabled={!formData.fullname || !formData.class_id || loading}
                             >
                                 Preview
                             </button>
                             <button
                                 type="submit"
                                 className="w-full px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium flex items-center justify-center gap-2"
-                                disabled={loading}
+                                disabled={!formData.fullname || !formData.class_id || loading}
                             >
                                 {loading ? (
                                     <>

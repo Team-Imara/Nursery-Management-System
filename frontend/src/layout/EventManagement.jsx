@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout.jsx";
 import axios from "../api/axios";
-import { Loader2 } from "lucide-react";
+import { Loader2, Calendar, Zap } from "lucide-react";
 
 const EventManagement = () => {
   const navigate = useNavigate();
@@ -346,6 +346,106 @@ const EventManagement = () => {
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
               </button>
             </div>
+          </div>
+        </div>
+        {/* Yearly Plan Section (Refined Top-tier Typography) */}
+        <div className="mt-12 bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 p-10 overflow-hidden relative">
+          {/* Subtle Background Decoration */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/10 rounded-full -mr-48 -mt-48 blur-[100px]"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-50/10 rounded-full -ml-48 -mb-48 blur-[100px]"></div>
+
+          <div className="relative flex items-center justify-between mb-12 px-2">
+            <div className="flex items-center gap-5">
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg shadow-purple-50">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                  Yearly Plan <span className="text-purple-600/80 font-semibold">{currentYear}</span>
+                </h2>
+                <p className="text-slate-500 font-medium mt-1 uppercase tracking-widest text-[9px] flex items-center gap-1.5 grayscale opacity-70">
+                  <Zap size={11} className="text-amber-500 fill-amber-500" />
+                  Nursery Special Calendar
+                </p>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center gap-3 border border-slate-100 bg-slate-50/30 p-1.5 rounded-xl">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg shadow-sm border border-slate-50">
+                <div className="w-2.5 h-2.5 rounded-full bg-purple-500/80"></div>
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">Special Events Only</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-8">
+            {months.map((month, index) => {
+              const monthEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate.getMonth() === index &&
+                  eventDate.getFullYear() === currentYear &&
+                  event.type === 'special';
+              }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+              const monthColors = [
+                'bg-indigo-500', 'bg-blue-500', 'bg-emerald-500', 'bg-orange-500',
+                'bg-red-500', 'bg-cyan-500', 'bg-rose-500', 'bg-lime-500',
+                'bg-violet-500', 'bg-amber-500', 'bg-sky-500', 'bg-fuchsia-500'
+              ];
+
+              return (
+                <div key={month} className="group relative flex flex-col md:flex-row items-center gap-6 md:gap-12">
+                  {/* Vertical Month Indicator (Refined Sticker style) */}
+                  <div className="w-full md:w-48 shrink-0 relative">
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 rounded-full bg-purple-50 group-hover:bg-purple-500 transition-colors duration-500"></div>
+                    <div className="bg-purple-600/90 px-5 py-3 rounded-xl shadow-md flex items-center justify-center">
+                      <span className="text-white font-bold text-xs tracking-widest uppercase italic font-medium">
+                        ({index + 1}) {month}
+                      </span>
+                    </div>
+                    <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-full h-[1px] w-6 border-t border-dashed border-slate-200"></div>
+                  </div>
+
+                  {/* Horizontal Event Rail */}
+                  <div className="w-full flex-1 min-h-[110px] relative">
+                    <div className="flex gap-5 overflow-x-auto pb-4 custom-scrollbar px-1">
+                      {monthEvents.length > 0 ? (
+                        monthEvents.map((event, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => navigate(`/event/${event.date}`, { state: { event } })}
+                            className="min-w-[240px] group/item relative p-4 bg-slate-50/40 rounded-2xl border border-slate-100 hover:bg-white hover:border-indigo-100 hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col gap-2"
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className={`${monthColors[index % monthColors.length]} px-2 py-1 rounded-lg text-white shadow-sm ring-2 ring-white/50`}>
+                                <span className="text-[10px] font-bold italic tracking-tighter">{new Date(event.date).getDate()}</span>
+                              </div>
+                              <div className="flex flex-col">
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">{month.slice(0, 3)}</p>
+                                {event.time && <span className="text-[8px] font-semibold text-indigo-500/50 mt-0.5">🕒 {event.time}</span>}
+                              </div>
+                            </div>
+
+                            <div className="mt-1">
+                              <h4 className="text-[13px] font-bold text-slate-700 leading-snug group-hover/item:text-indigo-600 transition-colors line-clamp-2">
+                                {event.title}
+                              </h4>
+                              {event.venue && (
+                                <p className="text-[9px] font-semibold text-slate-400 mt-1 uppercase tracking-tight italic opacity-60">📍 {event.venue}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex items-center gap-3 py-3 px-6 bg-slate-50/20 border border-dashed border-slate-100 rounded-2xl opacity-30">
+                          <Zap size={14} className="text-slate-300" />
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Reserved</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </main>
