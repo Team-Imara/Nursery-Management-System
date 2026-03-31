@@ -398,7 +398,7 @@ const EventManagement = () => {
                   <div className="w-full md:w-48 shrink-0 relative">
                     <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 rounded-full bg-purple-50 group-hover:bg-purple-500 transition-colors duration-500"></div>
                     <div className="bg-purple-600/90 px-5 py-3 rounded-xl shadow-md flex items-center justify-center">
-                      <span className="text-white font-bold text-xs tracking-widest uppercase italic font-medium">
+                      <span className="text-white text-xs tracking-widest uppercase italic font-medium">
                         ({index + 1}) {month}
                       </span>
                     </div>
