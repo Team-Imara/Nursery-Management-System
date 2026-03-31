@@ -168,6 +168,9 @@ Route::middleware(['auth:api', 'tenancy'])->group(function () {
     Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::post('notifications/send-custom', [NotificationController::class, 'sendCustom']); // Admin for custom sends
+    // Dashboard Data
+    Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index']);
+
     // Settings Management
     Route::get('settings', [\App\Http\Controllers\Api\SettingsController::class, 'index']);
     Route::post('settings/nursery', [\App\Http\Controllers\Api\SettingsController::class, 'updateNursery']);
