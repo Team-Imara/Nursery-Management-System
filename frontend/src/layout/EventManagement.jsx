@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout.jsx";
 import axios from "../api/axios";
 import { Loader2, Calendar, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const EventManagement = () => {
   const navigate = useNavigate();
@@ -30,6 +31,33 @@ const EventManagement = () => {
   // Filter and modal state
   const [filter, setFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
+
+  // Framer Motion Variants
+  const containerVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    initial: { y: 20, opacity: 0 },
+    animate: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 100, damping: 15 },
+    },
+  };
+
+  const cardVariants = {
+    initial: { scale: 0.95, opacity: 0 },
+    animate: {
+      scale: 1,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 120, damping: 12 },
+    },
+  };
 
   // Fetch events and classes on mount
   useEffect(() => {
@@ -161,19 +189,29 @@ const EventManagement = () => {
 
   return (
     <Layout>
-      <main className="flex-1 p-6 transition-all duration-300">
+      <main className="flex-1 transition-all duration-300">
         {/* Top bar (New Event button) */}
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold text-gray-900">
+        <motion.div
+          variants={itemVariants}
+          initial="initial"
+          animate="animate"
+          className="flex items-center justify-between mb-8"
+        >
+          <h1 className="text-3xl font-bold text-gray-900">
             Interactive Calendar
           </h1>
-        </div>
+        </motion.div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+        >
 
           {/* Calendar */}
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow p-6">
+          <motion.div variants={itemVariants} className="lg:col-span-2 bg-white rounded-2xl shadow p-6">
 
             {/* Month Navigation */}
             <div className="flex justify-between items-center mb-4">
@@ -250,10 +288,10 @@ const EventManagement = () => {
                 <span className="w-3 h-3 bg-yellow-300 rounded-full"></span> Events
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Event Editor */}
-          <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
+          <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
             <h2 className="text-lg font-semibold mb-2 text-slate-800">
               Create New Event
             </h2>
@@ -346,10 +384,15 @@ const EventManagement = () => {
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
               </button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
         {/* Yearly Plan Section (Refined Top-tier Typography) */}
-        <div className="mt-12 bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 p-10 overflow-hidden relative">
+        <motion.div
+          variants={itemVariants}
+          initial="initial"
+          animate="animate"
+          className="mt-12 bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 p-10 overflow-hidden relative"
+        >
           {/* Subtle Background Decoration */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/10 rounded-full -mr-48 -mt-48 blur-[100px]"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-50/10 rounded-full -ml-48 -mb-48 blur-[100px]"></div>
@@ -377,7 +420,7 @@ const EventManagement = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-8">
+          <motion.div className="flex flex-col gap-8" variants={containerVariants}>
             {months.map((month, index) => {
               const monthEvents = events.filter(event => {
                 const eventDate = new Date(event.date);
@@ -393,7 +436,7 @@ const EventManagement = () => {
               ];
 
               return (
-                <div key={month} className="group relative flex flex-col md:flex-row items-center gap-6 md:gap-12">
+                <motion.div key={month} variants={itemVariants} className="group relative flex flex-col md:flex-row items-center gap-6 md:gap-12">
                   {/* Vertical Month Indicator (Refined Sticker style) */}
                   <div className="w-full md:w-48 shrink-0 relative">
                     <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 rounded-full bg-purple-50 group-hover:bg-purple-500 transition-colors duration-500"></div>
@@ -443,11 +486,11 @@ const EventManagement = () => {
                       )}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
     </Layout>
   );
