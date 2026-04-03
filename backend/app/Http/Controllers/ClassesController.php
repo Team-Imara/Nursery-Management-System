@@ -10,7 +10,7 @@ class ClassesController extends Controller
 {
     public function index()
     {
-        return response()->json(Classes::with(['headTeacher', 'classIncharge', 'assistantTeachers'])->get());
+        return response()->json(Classes::with(['headTeacher', 'classIncharge', 'assistantTeachers'])->withCount('students')->get());
     }
 
     public function store(Request $request)
@@ -62,7 +62,7 @@ class ClassesController extends Controller
 
     public function show($id)
     {
-        return response()->json(Classes::with(['headTeacher', 'classIncharge', 'assistantTeachers', 'students'])->findOrFail($id));
+        return response()->json(Classes::with(['headTeacher', 'classIncharge', 'assistantTeachers', 'students'])->withCount('students')->findOrFail($id));
     }
 
     public function update(Request $request, $id)

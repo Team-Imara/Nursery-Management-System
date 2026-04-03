@@ -46,17 +46,6 @@ const AddNewClass = () => {
     });
   };
 
-  const handleAssistantToggle = (teacherId) => {
-    setForm(prev => {
-      const isSelected = prev.assistant_teacher_ids.includes(teacherId);
-      if (isSelected) {
-        return { ...prev, assistant_teacher_ids: prev.assistant_teacher_ids.filter(id => id !== teacherId) };
-      } else {
-        return { ...prev, assistant_teacher_ids: [...prev.assistant_teacher_ids, teacherId] };
-      }
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting form:", form);
@@ -88,22 +77,21 @@ const AddNewClass = () => {
     }
   };
 
-  const headerContent = (
-    <div className="flex items-center justify-between w-full">
-      <button
-        onClick={() => navigate('/class-management')}
-        className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-      >
-        <ArrowLeft size={20} />
-        Back to Classes
-      </button>
-    </div>
-  );
-
   return (
-    <Layout headerContent={headerContent}>
-      <main className="flex-1 p-8 overflow-auto">
+    <Layout>
+      <main className="flex-1 p-8 overflow-auto bg-gray-50">
         <div className="max-w-4xl mx-auto">
+          {/* Back Navigation */}
+          <div className="flex items-center mb-8">
+            <button
+              onClick={() => navigate('/class-management')}
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm font-bold"
+            >
+              <ArrowLeft size={20} />
+              Back to Class
+            </button>
+          </div>
+
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Create New Class</h1>
@@ -200,24 +188,23 @@ const AddNewClass = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Assistant Teachers</label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Assistant Teacher(s)</label>
+                  <select
+                    multiple
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white min-h-[120px]"
+                    value={form.assistant_teacher_ids}
+                    onChange={e => {
+                      const selectedOptions = Array.from(e.target.selectedOptions, option => Number(option.value));
+                      setForm({ ...form, assistant_teacher_ids: selectedOptions });
+                    }}
+                  >
                     {teachers.map(t => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => handleAssistantToggle(t.id)}
-                        className={`flex items-center justify-between px-4 py-3 rounded-lg border text-sm transition-all ${form.assistant_teacher_ids.includes(t.id)
-                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
-                          : 'bg-white border-gray-200 text-gray-700 hover:border-indigo-300'
-                          }`}
-                      >
-                        <span className="truncate mr-2">{t.fullname}</span>
-                        {form.assistant_teacher_ids.includes(t.id) && <Plus size={16} className="rotate-45" />}
-                      </button>
+                        <option key={t.id} value={t.id} className="p-2 hover:bg-indigo-50 cursor-pointer">
+                            {t.fullname}
+                        </option>
                     ))}
-                  </div>
-                  {teachers.length === 0 && <p className="text-sm text-gray-400">No teachers found in the database.</p>}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-2 italic">Hold Ctrl (Windows) or Command (Mac) to select multiple teachers.</p>
                 </div>
               </div>
             </div>
