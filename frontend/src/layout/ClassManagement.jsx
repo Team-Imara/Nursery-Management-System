@@ -52,7 +52,7 @@ const ClassManagement = () => {
         (c.classname || '').toLowerCase().includes(search.toLowerCase()) ||
         teacherName.toLowerCase().includes(search.toLowerCase());
 
-      const totalStudents = c.total_students || 0;
+      const totalStudents = c.students_count ?? c.total_students ?? 0;
       const matchesCapacity =
         capacityFilter === 'All' ||
         (capacityFilter === 'Full' && totalStudents >= c.capacity) ||
@@ -75,13 +75,7 @@ const ClassManagement = () => {
     }
   };
 
-  if (loading) return (
-    <Layout>
-      <div className="flex h-64 items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    </Layout>
-  );
+  if (loading) return <Layout />;
 
   return (
     <Layout>
@@ -179,14 +173,14 @@ const ClassManagement = () => {
                         <div className="flex justify-between items-end mb-1.5">
                           <span className="text-xs font-semibold text-gray-500">ENROLLMENT</span>
                           <span className="text-xs font-bold text-indigo-600">
-                            {cls.total_students || 0} / {cls.capacity}
+                            {cls.students_count ?? cls.total_students ?? 0} / {cls.capacity}
                           </span>
                         </div>
                         <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${Math.min(100, ((cls.total_students || 0) / cls.capacity) * 100)}%` }}
-                            className={`h-full rounded-full ${((cls.total_students || 0) >= cls.capacity) ? 'bg-amber-500' : 'bg-indigo-600'}`}
+                            animate={{ width: `${Math.min(100, ((cls.students_count ?? cls.total_students ?? 0) / cls.capacity) * 100)}%` }}
+                            className={`h-full rounded-full ${((cls.students_count ?? cls.total_students ?? 0) >= cls.capacity) ? 'bg-amber-500' : 'bg-indigo-600'}`}
                           />
                         </div>
                       </div>

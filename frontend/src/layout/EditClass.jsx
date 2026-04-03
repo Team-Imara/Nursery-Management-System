@@ -1,7 +1,7 @@
 // src/pages/EditClass.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft, Trash2 } from 'lucide-react';
+import { Save, ArrowLeft, Trash2, Plus } from 'lucide-react';
 import axios from '../api/axios';
 import Layout from '../components/Layout.jsx';
 
@@ -14,7 +14,9 @@ const EditClass = () => {
     const [form, setForm] = useState({
         classname: '',
         capacity: '',
-        head_teacher_id: ''
+        head_teacher_id: '',
+        class_incharge_id: '',
+        assistant_teacher_ids: []
     });
 
     useEffect(() => {
@@ -32,7 +34,9 @@ const EditClass = () => {
                 setForm({
                     classname: c.classname,
                     capacity: c.capacity,
-                    head_teacher_id: c.head_teacher_id
+                    head_teacher_id: c.head_teacher_id,
+                    class_incharge_id: c.class_incharge_id || '',
+                    assistant_teacher_ids: c.assistant_teachers ? c.assistant_teachers.map(t => t.id) : []
                 });
             } catch (err) {
                 console.error("Error fetching data:", err);
@@ -44,6 +48,17 @@ const EditClass = () => {
         };
         fetchData();
     }, [id, navigate]);
+
+    const handleAssistantToggle = (teacherId) => {
+        setForm(prev => {
+            const isSelected = prev.assistant_teacher_ids.includes(teacherId);
+            if (isSelected) {
+                return { ...prev, assistant_teacher_ids: prev.assistant_teacher_ids.filter(id => id !== teacherId) };
+            } else {
+                return { ...prev, assistant_teacher_ids: [...prev.assistant_teacher_ids, teacherId] };
+            }
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -120,19 +135,59 @@ const EditClass = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Lead Teacher *</label>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Head Teacher *</label>
                                     <select
                                         required
                                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white"
                                         value={form.head_teacher_id}
                                         onChange={e => setForm({ ...form, head_teacher_id: e.target.value })}
                                     >
-                                        <option value="">Select a Teacher</option>
+                                        <option value="">Assign Head Teacher</option>
                                         {teachers.map(t => (
-                                            <option key={t.id} value={t.id}>{t.fullname} ({t.role})</option>
+                                            <option key={t.id} value={t.id}>{t.fullname}</option>
                                         ))}
                                     </select>
                                 </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Class Incharge</label>
+                                    <select
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white"
+                                        value={form.class_incharge_id}
+                                        onChange={e => setForm({ ...form, class_incharge_id: e.target.value })}
+                                    >
+                                        <option value="">Assign Class Incharge</option>
+                                        {teachers.map(t => (
+                                            <option key={t.id} value={t.id}>{t.fullname}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-3">Assistant Teachers</label>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {teachers.map(t => {
+                                        const isSelected = form.assistant_teacher_ids.includes(t.id);
+                                        return (
+                                            <button
+                                                key={t.id}
+                                                type="button"
+                                                onClick={() => handleAssistantToggle(t.id)}
+                                                className={`flex items-center justify-between px-4 py-3 rounded-lg border text-sm transition-all ${isSelected
+                                                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+                                                    : 'bg-white border-gray-200 text-gray-700 hover:border-indigo-300'
+                                                    }`}
+                                            >
+                                                <span className="truncate mr-2">{t.fullname}</span>
+                                                {isSelected && <Plus size={16} className="rotate-45" />}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                {teachers.length === 0 && <p className="text-sm text-gray-400">No teachers found.</p>}
                             </div>
                         </div>
 
