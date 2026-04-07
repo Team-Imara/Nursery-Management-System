@@ -132,7 +132,10 @@ Route::middleware(['auth:api', 'tenancy'])->group(function () {
 
     // Meal Plans (FR7)
     Route::get('meal-plans', [MealPlanController::class, 'index']); // With optional ?classId=
-    Route::post('meal-plans', [MealPlanController::class, 'store']);
+    Route::post('meal-plans', function (Request $request) {
+        \Illuminate\Support\Facades\Log::info('Routing reached meal-plans POST', $request->all());
+        return app(MealPlanController::class)->store($request);
+    });
     Route::get('meal-plans/{id}', [MealPlanController::class, 'show']);
     Route::put('meal-plans/{id}', [MealPlanController::class, 'update']);
     Route::delete('meal-plans/{id}', [MealPlanController::class, 'destroy']);
