@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MealPlanForm from '../components/MealplanForm';
-import { UserPlus, BriefcaseMedical, FileBarChart } from 'lucide-react';
+import { UserPlus, BriefcaseMedical, Utensils, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Utensils } from 'lucide-react';
 import Layout from '../components/Layout.jsx';
+import axios from '../api/axios';
 
 /* -------------------------------------------------
    Animation variants
@@ -19,42 +19,15 @@ const cardAnimationVariants = {
   },
 };
 
-/* -------------------------------------------------
-   Small Filters Box (inline next to title)
-   ------------------------------------------------- */
-function FiltersBox() {
-  return (
-    <motion.div
-      variants={cardAnimationVariants}
-      className="flex items-center gap-4"
-    >
-      <div>
-        <label className="text-md font-medium text-gray-600">Class:</label>
-        <select className="ml-1 text-md px-4 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-slate-800">
-          <option>All</option>
-          <option>Kindergarten1</option>
-          <option>Kindergarten2</option>
-
-        </select>
-      </div>
-    </motion.div>
-  );
-}
 
 /* -------------------------------------------------
    Meal Plan Table
    ------------------------------------------------- */
-function MealCell({ meal, indicator }) {
-  const color =
-    indicator === 'healthy' ? 'bg-green-500' :
-      indicator === 'review' ? 'bg-yellow-500' :
-        indicator === 'allergy' ? 'bg-red-500' : '';
-
+function MealCell({ meal }) {
   return (
     <td className="px-4 py-4 border-r border-gray-200 last:border-r-0">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-900">{meal}</span>
-        {indicator && <div className={`w-2 h-2 rounded-full ${color}`} />}
+        <span className="text-sm text-gray-900">{meal || '—'}</span>
       </div>
     </td>
   );
@@ -67,65 +40,56 @@ function MealRow({ type, days }) {
         {type}
       </td>
       {days.map((day, idx) => (
-        <MealCell key={idx} meal={day.meal} indicator={day.indicator} />
+        <MealCell key={idx} meal={day.meal_name} />
       ))}
     </tr>
   );
 }
 
-function MealPlanTable() {
-  const breakfastData = [
-    { day: 'Mon', meal: 'Fruit salad', indicator: 'healthy' },
-    { day: 'Tue', meal: 'Idli & milk', indicator: 'healthy' },
-    { day: 'Wed', meal: 'Upma', indicator: 'healthy' },
-    { day: 'Thu', meal: 'Oat porridge', indicator: 'healthy' },
-    { day: 'Fri', meal: '—' },
-  ];
+function MealPlanTable({ data, loading }) {
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const MEAL_TYPES = ['Breakfast', 'Snack'];
 
-  const snackData = [
-    { day: 'Mon', meal: 'Banana', indicator: 'healthy' },
-    { day: 'Tue', meal: 'Yogurt', indicator: 'healthy' },
-    { day: 'Wed', meal: 'Apple slices', indicator: 'review' },
-    { day: 'Thu', meal: 'Chickpea salad', indicator: 'healthy' },
-    { day: 'Fri', meal: '—' },
-  ];
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-20 flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+        <p className="text-sm text-gray-400 font-medium">Fetching weekly meal plan...</p>
+      </div>
+    );
+  }
+
+  // Transform flat API array into rows/cells
+  const getRowData = (type) => {
+    if (!Array.isArray(data)) return DAYS.map(() => ({ meal_name: '—' }));
+    return DAYS.map(dayKey => {
+      const match = data.find(m => m.meal_type === type && m.day === dayKey);
+      return match ? { meal_name: match.meal_name } : { meal_name: '—' };
+    });
+  };
 
   return (
-    <motion.div variants={cardAnimationVariants} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <table className="w-full">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
               Meal Type
             </th>
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map(day => (
+            {DAYS.map(day => (
               <th key={day} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
-                {day}
+                {day.substring(0, 3).toUpperCase()}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          <MealRow type="Breakfast" days={breakfastData} />
-          <MealRow type="Snack" days={snackData} />
+          {MEAL_TYPES.map(type => (
+            <MealRow key={type} type={type} days={getRowData(type)} />
+          ))}
         </tbody>
       </table>
-
-      <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center gap-6 text-xs">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-500" />
-          <span className="text-gray-600">Healthy</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-yellow-500" />
-          <span className="text-gray-600">Needs review</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-red-500" />
-          <span className="text-gray-600">Allergy risk</span>
-        </div>
-      </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -174,7 +138,7 @@ function StudentTrackingLog() {
         : 'bg-yellow-100 text-yellow-800';
 
   return (
-    <motion.div variants={cardAnimationVariants} className="bg-white rounded-lg border border-gray-200">
+    <div className="bg-white rounded-lg border border-gray-200">
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900">Student Meal Tracking Log</h3>
         <div className="flex gap-2 mt-3">
@@ -240,7 +204,7 @@ function StudentTrackingLog() {
           </tbody>
         </table>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -290,111 +254,109 @@ function QuickActions() {
     </motion.div>
   );
 }
+
 /* -------------------------------------------------
    Main App
    ------------------------------------------------- */
 export default function App() {
   const [showForm, setShowForm] = useState(false);
+  const [mealData, setMealData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchMealPlan = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('/meal-plans');
+      console.log('Meal plan API data:', response.data);
+      setMealData(response.data || []);
+    } catch (error) {
+      console.error('Error fetching meal plan:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMealPlan();
+  }, []);
 
   return (
     <Layout>
       <main className="p-8">
-        <motion.div
-          initial="initial"
-          animate="animate"
-          variants={{
-            animate: { transition: { staggerChildren: 0.15 } },
-          }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LEFT COLUMN – 2/3 */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Title + Filters (inline) */}
+            {/* Title + button */}
             <div className="flex items-center gap-3 justify-between">
               <div className="flex items-center gap-3">
                 <Utensils className="w-8 h-8 text-gray-900" />
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">Meal Plan</h1>
                   <p className="text-sm text-gray-500 mt-1">
-                    Plan meals for the week.
+                    Plan meals for the week for all classes.
                   </p>
-
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <FiltersBox /> {/* This is the small box next to title */}
-                <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-md hover:bg-slate-700">
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="px-5 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-100 flex items-center gap-2"
+                >
+                  <Utensils size={16} />
                   Add/Update Meal Plan
                 </button>
               </div>
             </div>
 
-
             {/* Meal Table */}
-            <MealPlanTable />
-
-            {/* Action Buttons */}
-
-
-
-
+            <MealPlanTable data={mealData} loading={loading} />
           </div>
 
           {/* RIGHT COLUMN – 1/3 */}
           <div>
             <WarningsAndSuggestions />
           </div>
-          {/* Student Log */}
+        </div>
 
-        </motion.div>
-        <motion.div
-          initial="initial"
-          animate="animate"
-          variants={{
-            animate: { transition: { staggerChildren: 0.15 } },
-          }} className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
           <div className="lg:col-span-3">
             <StudentTrackingLog />
           </div>
           <div>
             <QuickActions />
           </div>
-        </motion.div>
+        </div>
 
 
       </main>
-      {showForm && (
-        <AnimatePresence>
-          {showForm && (
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            key="modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowForm(false)}
+          >
             <motion.div
-              key="modal"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{
-                duration: 0.4,
-                scale: { type: "spring", duration: 0.4, bounce: 0.3 },
-                opacity: { duration: 0.3 },
-              }}
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" // Overlay with centering
-              onClick={() => setShowForm(false)}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
             >
-              <motion.div
-                className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
-                onClick={(e) => e.stopPropagation()} // Prevent close on content click
-              >
-                <MealPlanForm
-                  onClose={() => setShowForm(false)}
-                  onSuccess={() => {
-                    alert('Meal plan saved successfully!');
-                    setShowForm(false);
-                  }}
-                />
-              </motion.div>
+              <MealPlanForm
+                onClose={() => setShowForm(false)}
+                onSuccess={() => {
+                  fetchMealPlan();
+                  setShowForm(false);
+                }}
+              />
             </motion.div>
-          )}
-        </AnimatePresence>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Layout>
   );
 }
