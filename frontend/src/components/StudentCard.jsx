@@ -16,12 +16,12 @@ const StudentCard = ({ student, onSelect }) => {
     >
       <div className="flex items-start gap-4">
         <div className="w-16 h-16 rounded-full overflow-hidden">
-          <img src={student.image} className="w-full h-full object-cover" />
+          <img src={student.image_url} className="w-full h-full object-cover" />
         </div>
 
         <div className="flex flex-col justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900 text-lg">{student.fullname || student.name}</h3>
+            <h3 className="font-semibold text-gray-900 text-lg">{student.name_with_initials || student.name}</h3>
             <p className="text-sm text-gray-600 mb-1">{student.classe?.classname || student.class} • {student.section}</p>
 
           </div>

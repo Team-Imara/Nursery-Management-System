@@ -23,4 +23,12 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'nursery_email',
         ];
     }
+    protected $appends = ['logo_url'];
+
+    public function getLogoUrlAttribute()
+    {
+        if (!$this->nursery_logo) return null;
+        if (str_starts_with($this->nursery_logo, 'http')) return $this->nursery_logo;
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->nursery_logo);
+    }
 }
