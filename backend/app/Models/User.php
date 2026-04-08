@@ -23,6 +23,20 @@ class User extends Authenticatable implements JWTSubject {
 
     protected $hidden = ['password', 'remember_token'];
 
+    protected $appends = ['profile_photo_url', 'image'];
+    
+    public function getProfilePhotoUrlAttribute()
+    {
+        if (!$this->profile_photo) return null;
+        if (str_starts_with($this->profile_photo, 'http')) return $this->profile_photo;
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_photo);
+    }
+
+    public function getImageAttribute()
+    {
+        return $this->profile_photo_url;
+    }
+
     public function classes() {
         return $this->belongsToMany(Classes::class, 'class_teacher', 'teacher_id', 'class_id'); // Note: Use 'Classe' to avoid 'class' keyword
     }

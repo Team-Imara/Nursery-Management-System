@@ -16,7 +16,7 @@ class DevTenantSeeder extends Seeder
     {
         // 1. Create or Find Tenant
         $tenant = Tenant::firstOrCreate(['id' => 'dev-tenant']);
-        
+
         // 2. Create or Find Domain
         foreach (['tenant1.localhost', 'localhost', '127.0.0.1'] as $domain) {
             if (!$tenant->domains()->where('domain', $domain)->exists()) {
@@ -41,9 +41,10 @@ class DevTenantSeeder extends Seeder
 
         // 5. Create a Class
         $class = Classes::firstOrCreate(
-            ['classname' => 'Kindergarten', 'tenant_id' => $tenant->id],
+            ['classname' => 'KG1', 'tenant_id' => $tenant->id],
             [
                 'capacity' => 20,
+                'sections' => 'A',
                 'head_teacher_id' => $admin->id,
             ]
         );

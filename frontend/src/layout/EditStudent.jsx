@@ -107,8 +107,9 @@ const EditStudent = () => {
                     if (mappedData.enrollment_date) mappedData.enrollment_date = mappedData.enrollment_date.split('T')[0];
 
                     setFormData(mappedData);
-                    if (studentData.image) {
-                        setPreviewImage(studentData.image);
+                    const initialImage = studentData.image_url || studentData.image;
+                    if (initialImage) {
+                        setPreviewImage(initialImage);
                     }
                 }
             } catch (err) {

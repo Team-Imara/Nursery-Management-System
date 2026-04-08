@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
@@ -75,7 +77,13 @@ class StudentController extends Controller
             'weight' => 'nullable|numeric',
             'special_needs' => 'nullable|string',
             'health_notes' => 'nullable|string',
+            'image' => 'nullable|string', // Base64 string
         ]);
+
+        if ($request->has('image') && !empty($request->image) && str_starts_with($request->image, 'data:image')) {
+            $validated['image'] = $this->saveImage($request->image);
+        }
+
         $student = Student::create($validated);
         return response()->json($student, 201);
     }
@@ -139,14 +147,41 @@ class StudentController extends Controller
             'weight' => 'nullable|numeric',
             'special_needs' => 'nullable|string',
             'health_notes' => 'nullable|string',
+            'image' => 'nullable|string', // Base64 string
         ]);
+
+        if ($request->has('image') && !empty($request->image) && str_starts_with($request->image, 'data:image')) {
+            if ($student->getRawOriginal('image')) {
+                Storage::disk('public')->delete($student->getRawOriginal('image'));
+            }
+            $validated['image'] = $this->saveImage($request->image);
+        }
+
         $student->update($validated);
         return response()->json($student);
     }
 
     public function destroy($id)
     {
-        Student::findOrFail($id)->delete();
+        $student = Student::findOrFail($id);
+        if ($student->getRawOriginal('image')) {
+            Storage::disk('public')->delete($student->getRawOriginal('image'));
+        }
+        $student->delete();
         return response()->json(null, 204);
+    }
+
+    private function saveImage($base64Image)
+    {
+        $image_service_str = explode(';', $base64Image)[0];
+        $extension = explode('/', $image_service_str)[1];
+        $fileName = Str::random(10) . '.' . $extension;
+        $imageData = substr($base64Image, strpos($base64Image, ',') + 1);
+        $imageData = base64_decode($imageData);
+
+        $path = "students/" . tenancy()->tenant->id . "/" . $fileName;
+        Storage::disk('public')->put($path, $imageData);
+
+        return $path;
     }
 }

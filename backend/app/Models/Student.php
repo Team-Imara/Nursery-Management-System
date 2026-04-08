@@ -14,10 +14,12 @@ class Student extends BaseTenantModel
         'favourite_toys', 'first_language', 'class_id', 'section', 'mother_name', 'mother_contact', 'mother_occupation', 'mother_nic',
         'father_name', 'father_contact', 'father_occupation', 'father_nic', 'whatsapp_number', 'guardian_type', 'guardian_name', 'guardian_contact',
         'guardian_occupation', 'guardian_nic', 'guardian_address', 'emergency_contact_name', 'emergency_contact_phone',
-        'allergies', 'height', 'weight', 'special_needs', 'health_notes', 'tenant_id',
+        'allergies', 'height', 'weight', 'special_needs', 'health_notes', 'tenant_id', 'image',
         'assessment_reading', 'assessment_writing', 'assessment_numbers', 'assessment_language_tamil',
         'assessment_language_english', 'assessment_language_sinhala', 'assessment_drawing', 'assessment_notes'
     ];
+
+    protected $appends = ['image_url'];
 
     protected function casts(): array
     {
@@ -27,6 +29,13 @@ class Student extends BaseTenantModel
             'height' => 'decimal:2',
             'weight' => 'decimal:2',
         ];
+    }
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) return null;
+        if (str_starts_with($this->image, 'http')) return $this->image;
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->image);
     }
 
     public function classe()
