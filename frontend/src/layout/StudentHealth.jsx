@@ -1,275 +1,181 @@
-import { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, Search, ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import axios from '../api/axios';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout.jsx';
 
 const StudentHealth = () => {
-  const { students, updateStudentHealth, addStudent } = useAppContext();
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [name, setName] = useState('');
-  const [grade, setGrade] = useState('');
-  const [allergies, setAllergies] = useState('');
-  const [healthIssues, setHealthIssues] = useState('');
-  const [emergencyContact, setEmergencyContact] = useState('');
-  const [emergencyFirstAid, setEmergencyFirstAid] = useState('');
-  const [showSuccess, setShowSuccess] = useState(false);
+  const navigate = useNavigate();
+  const [students, setStudents] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentTab, setCurrentTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleStudentSelect = (studentId) => {
-    const student = students.find(s => s.id === parseInt(studentId));
-    setSelectedStudent(student);
-    if (student) {
-      setName(student.name);
-      setGrade(student.grade);
-      setAllergies(student.allergies?.join(', ') || '');
-      setHealthIssues(student.healthIssues?.join(', ') || '');
-      setEmergencyContact(student.emergencyContact || '');
-      setEmergencyFirstAid(student.emergencyFirstAid || '');
-    } else {
-      setName('');
-      setGrade('');
-      setAllergies('');
-      setHealthIssues('');
-      setEmergencyContact('');
-      setEmergencyFirstAid('');
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [studentsRes, classesRes] = await Promise.all([
+        axios.get('/students'),
+        axios.get('/classes')
+      ]);
+      setStudents(studentsRes.data);
+      setClasses(classesRes.data);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError('Failed to load student data. Please refresh the page.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError('');
-    if (!name.trim() || !grade) {
-      setError('Please provide student name and grade');
-      return;
-    }
-    const allergiesArray = allergies
-      .split(',')
-      .map(item => item.trim())
-      .filter(item => item.length > 0);
-    const healthIssuesArray = healthIssues
-      .split(',')
-      .map(item => item.trim())
-      .filter(item => item.length > 0);
-    const data = {
-      allergies: allergiesArray,
-      healthIssues: healthIssuesArray,
-      emergencyContact: emergencyContact.trim(),
-      emergencyFirstAid: emergencyFirstAid.trim()
-    };
-    if (selectedStudent) {
-      updateStudentHealth(selectedStudent.id, data);
-    } else {
-      const newId = students.length ? Math.max(...students.map(s => s.id)) + 1 : 1;
-      const newStudent = {
-        id: newId,
-        name: name.trim(),
-        grade,
-        ...data
-      };
-      addStudent(newStudent);
-    }
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
-    handleClear();
-  };
 
-  const handleClear = () => {
-    setSelectedStudent(null);
-    setName('');
-    setGrade('');
-    setAllergies('');
-    setHealthIssues('');
-    setEmergencyContact('');
-    setEmergencyFirstAid('');
-    setError('');
-  };
+  const filteredStudents = students.filter(student => {
+    const matchesTab = currentTab === 'all' || 
+                      (student.classe && student.classe.id.toString() === currentTab);
+    const matchesSearch = student.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         student.allergies?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
 
-  const filteredStudents = currentTab === 'all'
-    ? students
-    : students.filter(s => s.grade === currentTab);
 
   return (
     <Layout>
-      <main className="max-w-6xl mx-auto p-8 flex flex-col gap-8">
-        <motion.div
-          initial="initial"
-          animate="animate"
-          variants={{
-            animate: { transition: { staggerChildren: 0.15 } },
-          }} className="bg-white rounded-xl p-8 shadow-md">
-          <h2 className="text-xl text-blue-800 mb-6">Manage Student Health Information</h2>
-          {showSuccess && (
-            <div className="p-4 rounded-lg mb-6 font-medium bg-green-100 text-green-800 border border-green-400" role="alert">
-              ✓ Health information updated successfully!
-            </div>
-          )}
-          {error && (
-            <div className="p-4 rounded-lg mb-6 font-medium bg-red-100 text-red-800 border border-red-400" role="alert">
-              ✗ {error}
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="student-select" className="font-semibold text-gray-800 text-base">Select Student to Edit (or leave blank to add new):</label>
-              <select
-                id="student-select"
-                value={selectedStudent?.id || ''}
-                onChange={(e) => handleStudentSelect(e.target.value)}
-                className="p-3 border-2 border-slate-200 rounded-lg text-base font-inherit transition-colors duration-200 focus:outline-none focus:border-indigo-500"
-              >
-                <option value="">-- Add New Student --</option>
-                {students.map(student => (
-                  <option key={student.id} value={student.id}>
-                    {student.name} ({student.grade.toUpperCase()})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="font-semibold text-gray-800 text-base">Student Name: *</label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="p-3 border-2 border-slate-200 rounded-lg text-base font-inherit transition-colors duration-200 focus:outline-none focus:border-indigo-500"
-                disabled={!!selectedStudent}
-                required
-                placeholder="Enter student name"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="grade" className="font-semibold text-gray-800 text-base">Grade: *</label>
-              <select
-                id="grade"
-                value={grade}
-                onChange={(e) => setGrade(e.target.value)}
-                className="p-3 border-2 border-slate-200 rounded-lg text-base font-inherit transition-colors duration-200 focus:outline-none focus:border-indigo-500"
-                disabled={!!selectedStudent}
-                required
-              >
-                <option value="">-- Select Grade --</option>
-                <option value="kg1">Kindergarten1</option>
-                <option value="kg2">Kindergarten2</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="allergies" className="font-semibold text-gray-800 text-base">Allergies:</label>
-              <textarea
-                id="allergies"
-                value={allergies}
-                onChange={(e) => setAllergies(e.target.value)}
-                className="p-3 border-2 border-slate-200 rounded-lg text-base font-inherit transition-colors duration-200 focus:outline-none focus:border-indigo-500"
-                rows="3"
-                placeholder="Enter allergies separated by commas (e.g., peanuts, dairy, eggs)"
-                aria-describedby="allergies-help"
-              />
-              <small id="allergies-help" className="text-gray-500 text-sm">
-                Separate multiple allergies with commas
-              </small>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="health-issues" className="font-semibold text-gray-800 text-base">Health Issues:</label>
-              <textarea
-                id="health-issues"
-                value={healthIssues}
-                onChange={(e) => setHealthIssues(e.target.value)}
-                className="p-3 border-2 border-slate-200 rounded-lg text-base font-inherit transition-colors duration-200 focus:outline-none focus:border-indigo-500"
-                rows="3"
-                placeholder="Enter health issues separated by commas (e.g., asthma, diabetes)"
-                aria-describedby="health-help"
-              />
-              <small id="health-help" className="text-gray-500 text-sm">
-                Separate multiple issues with commas
-              </small>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="emergency-contact" className="font-semibold text-gray-800 text-base">Emergency Contact:</label>
-              <input
-                id="emergency-contact"
-                type="text"
-                value={emergencyContact}
-                onChange={(e) => setEmergencyContact(e.target.value)}
-                className="p-3 border-2 border-slate-200 rounded-lg text-base font-inherit transition-colors duration-200 focus:outline-none focus:border-indigo-500"
-                placeholder="Enter emergency contact (e.g., phone number or name)"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="emergency-firstaid" className="font-semibold text-gray-800 text-base">Emergency First Aid Instructions:</label>
-              <textarea
-                id="emergency-firstaid"
-                value={emergencyFirstAid}
-                onChange={(e) => setEmergencyFirstAid(e.target.value)}
-                className="p-3 border-2 border-slate-200 rounded-lg text-base font-inherit transition-colors duration-200 focus:outline-none focus:border-indigo-500"
-                rows="3"
-                placeholder="Enter any specific first aid instructions"
-              />
-            </div>
-            <div className="flex gap-4 flex-col sm:flex-row">
-              <button type="submit" className="py-[0.875rem] px-[1.5rem] border-none rounded-lg text-base font-semibold cursor-pointer transition duration-200 flex-1 bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-2 focus:outline-indigo-500 focus:outline-offset-2">
-                {selectedStudent ? 'Update Health Information' : 'Add Student'}
-              </button>
-              <button type="button" onClick={handleClear} className="py-[0.875rem] px-[1.5rem] border-none rounded-lg text-base font-semibold cursor-pointer transition duration-200 flex-1 bg-slate-200 text-gray-800 hover:bg-slate-300 focus:outline-2 focus:outline-slate-300 focus:outline-offset-2">
-                Clear Form
-              </button>
-            </div>
-          </form>
-        </motion.div>
-        <section className="bg-white rounded-xl p-8 shadow-md">
-          <h2 className="text-xl text-gray-800 mb-6">All Students Health Overview</h2>
-          <div className="flex space-x-2 mb-4">
-            <button
-              onClick={() => setCurrentTab('all')}
-              className={`${currentTab === 'all' ? 'bg-white text-indigo-500 border-b-2 border-indigo-500' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} px-4 py-2 rounded-t-lg font-medium focus:outline-none transition-colors duration-200`}
-            >
-              All Students
-            </button>
-            <button
-              onClick={() => setCurrentTab('kg1')}
-              className={`${currentTab === 'kg1' ? 'bg-white text-indigo-500 border-b-2 border-indigo-500' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} px-4 py-2 rounded-t-lg font-medium focus:outline-none transition-colors duration-200`}
-            >
-              Kindergarten1
-            </button>
-            <button
-              onClick={() => setCurrentTab('kg2')}
-              className={`${currentTab === 'kg2' ? 'bg-white text-indigo-500 border-b-2 border-indigo-500' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} px-4 py-2 rounded-t-lg font-medium focus:outline-none transition-colors duration-200`}
-            >
-              Kindergarten2
-            </button>
+      <main className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col gap-6">
+        <div className="flex items-center justify-start">
+          <button
+            onClick={() => navigate('/meal-plan')}
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-all font-medium"
+          >
+            <ArrowLeft size={20} />
+            Back to Meal Plan
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Student Health Records</h1>
+            <p className="text-gray-500 mt-1">Manage and monitor student medical information and allergies.</p>
           </div>
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allergies</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Health Issues</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emergency Contact</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emergency First Aid</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredStudents.map(student => (
-                <tr key={student.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.grade.toUpperCase()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.allergies?.join(', ') || 'None'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.healthIssues?.join(', ') || 'None'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.emergencyContact || 'None'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.emergencyFirstAid || 'None'}</td>
-                </tr>
-              ))}
-              {filteredStudents.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">No students in this category</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
+        </div>
+
+        <div className="grid grid-cols-1 gap-8">
+          {/* Table Side */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100 w-full md:w-80">
+                  <Search className="text-gray-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Search students or allergies..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-transparent border-none focus:outline-none text-sm w-full"
+                  />
+                </div>
+
+                <div className="flex gap-1 p-1 bg-gray-50 rounded-xl border border-gray-100 overflow-x-auto">
+                  <button
+                    onClick={() => setCurrentTab('all')}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${currentTab === 'all' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                  >
+                    All
+                  </button>
+                  {classes.map(cls => (
+                    <button
+                      key={cls.id}
+                      onClick={() => setCurrentTab(cls.id.toString())}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${currentTab === cls.id.toString() ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                    >
+                      {cls.classname}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-gray-50/50">
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Student & Class</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Allergies</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Special Needs</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Emergency</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {loading && students.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-12 text-center">
+                          <Loader2 className="animate-spin text-blue-600 mx-auto mb-2" size={32} />
+                          <p className="text-gray-500">Loading student records...</p>
+                        </td>
+                      </tr>
+                    ) : filteredStudents.length > 0 ? (
+                      filteredStudents.map(student => (
+                        <tr
+                          key={student.id}
+                          className="hover:bg-gray-50/80 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <div>
+                              <div className="font-semibold text-gray-900">{student.fullname}</div>
+                              <div className="text-xs text-gray-500">{student.classe?.classname} {student.section && `- ${student.section}`}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {student.allergies ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                                {student.allergies}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-gray-400">None</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm text-gray-600 line-clamp-1">{student.special_needs || '—'}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900 font-medium">{student.emergency_contact_phone || '—'}</div>
+                            <div className="text-xs text-gray-500 line-clamp-1">{student.health_notes || student.emergency_contact_name}</div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-12 text-center">
+                          <div className="text-gray-400 mb-2">
+                            <Search size={40} className="mx-auto opacity-20" />
+                          </div>
+                          <p className="text-gray-500 font-medium">No students found matching your criteria</p>
+                          <button
+                            onClick={() => {setSearchQuery(''); setCurrentTab('all');}}
+                            className="mt-2 text-blue-600 text-sm hover:underline"
+                          >
+                            Clear all filters
+                          </button>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </main>
     </Layout>
   );
-}
+};
 export default StudentHealth;

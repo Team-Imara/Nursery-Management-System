@@ -10,7 +10,6 @@ const ClassDetail = () => {
     const navigate = useNavigate();
     const [classData, setClassData] = useState(null);
     const [timetable, setTimetable] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [saving, setSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -55,8 +54,6 @@ const ClassDetail = () => {
             } catch (err) {
                 console.error("Error fetching class details:", err);
                 setError("Failed to load class details");
-            } finally {
-                setLoading(false);
             }
         };
 
@@ -91,14 +88,11 @@ const ClassDetail = () => {
     };
 
 
-    if (!classData) {
-        if (!error && loading) {
-            return <Layout />;
-        }
+    if (!classData && error) {
         return (
             <Layout>
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <h2 className="text-2xl font-bold text-gray-900">{error || "Class not found"}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">{error}</h2>
                     <button onClick={() => navigate('/class-management')} className="mt-6 text-indigo-600 font-semibold hover:underline">
                         Return to class list
                     </button>
@@ -126,9 +120,9 @@ const ClassDetail = () => {
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
                         <div className="flex justify-between items-start mb-8">
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900 mb-2">{classData.classname}</h1>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">{classData?.classname}</h1>
                                 <div className="flex gap-2">
-                                    {(classData.sections || []).map(s => (
+                                    {(classData?.sections || []).map(s => (
                                         <span key={s} className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold ring-1 ring-indigo-100">
                                             Section {s}
                                         </span>
@@ -147,23 +141,23 @@ const ClassDetail = () => {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Head Teacher</p>
-                                <p className="text-lg font-bold text-gray-900">{classData.head_teacher?.fullname || classData.headTeacher?.fullname || 'Not Assigned'}</p>
+                                <p className="text-lg font-bold text-gray-900">{classData?.head_teacher?.fullname || classData?.headTeacher?.fullname || 'Not Assigned'}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Class Incharge</p>
-                                <p className="text-lg font-bold text-gray-900">{classData.class_incharge?.fullname || classData.classIncharge?.fullname || 'Not Assigned'}</p>
+                                <p className="text-lg font-bold text-gray-900">{classData?.class_incharge?.fullname || classData?.classIncharge?.fullname || 'Not Assigned'}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Assistant Teachers</p>
                                 <p className="text-sm font-bold text-gray-900">
-                                    {((classData.assistant_teachers || classData.assistantTeachers)?.length > 0)
-                                        ? (classData.assistant_teachers || classData.assistantTeachers).map(t => t.fullname).join(', ')
+                                    {((classData?.assistant_teachers || classData?.assistantTeachers)?.length > 0)
+                                        ? (classData?.assistant_teachers || classData?.assistantTeachers).map(t => t.fullname).join(', ')
                                         : 'None'}
                                 </p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Capacity</p>
-                                <p className="text-lg font-bold text-gray-900">{classData.students_count ?? classData.total_students ?? 0} / {classData.capacity}</p>
+                                <p className="text-lg font-bold text-gray-900">{classData?.students_count ?? classData?.total_students ?? 0} / {classData?.capacity}</p>
                             </div>
                         </div>
                     </div>
@@ -273,15 +267,15 @@ const ClassDetail = () => {
                             </div>
                             <div className="flex gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
                                 <div className="text-center px-4">
-                                    <span className="block text-2xl font-black text-indigo-600">{classData.students?.length || 0}</span>
+                                    <span className="block text-2xl font-black text-indigo-600">{classData?.students?.length || 0}</span>
                                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total</span>
                                 </div>
                                 <div className="text-center px-4 border-l border-gray-200">
-                                    <span className="block text-2xl font-black text-rose-500">{classData.students?.filter(s => s.gender?.toLowerCase() === 'female' || s.gender?.toLowerCase() === 'girl').length || 0}</span>
+                                    <span className="block text-2xl font-black text-rose-500">{classData?.students?.filter(s => s.gender?.toLowerCase() === 'female' || s.gender?.toLowerCase() === 'girl').length || 0}</span>
                                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Girls</span>
                                 </div>
                                 <div className="text-center px-4 border-l border-gray-200">
-                                    <span className="block text-2xl font-black text-blue-500">{classData.students?.filter(s => s.gender?.toLowerCase() === 'male' || s.gender?.toLowerCase() === 'boy').length || 0}</span>
+                                    <span className="block text-2xl font-black text-blue-500">{classData?.students?.filter(s => s.gender?.toLowerCase() === 'male' || s.gender?.toLowerCase() === 'boy').length || 0}</span>
                                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Boys</span>
                                 </div>
                             </div>
@@ -298,7 +292,7 @@ const ClassDetail = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {(classData.students && classData.students.length > 0) ? classData.students.map((student) => (
+                                    {(classData?.students && classData?.students.length > 0) ? classData?.students.map((student) => (
                                         <tr key={student.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="p-4 border-b border-gray-100 text-sm font-bold text-gray-900 flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs uppercase">
@@ -327,7 +321,7 @@ const ClassDetail = () => {
                                                 </button>
                                             </td>
                                         </tr>
-                                    )) : (
+                                    )) : classData !== null && (
                                         <tr>
                                             <td colSpan="4" className="p-8 text-center text-gray-500 font-medium">
                                                 No students enrolled in this class yet.
