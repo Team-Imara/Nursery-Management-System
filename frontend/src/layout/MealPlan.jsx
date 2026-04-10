@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MealPlanForm from '../components/MealplanForm';
-import { UserPlus, BriefcaseMedical, Utensils, Loader2 } from 'lucide-react';
+import { UserPlus, BriefcaseMedical, Utensils, Loader2, Search, Bell, CheckCircle, Notebook, Filter, MessageSquare, ShieldAlert, Heart, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
 import axios from '../api/axios';
@@ -94,113 +94,169 @@ function MealPlanTable({ data, loading }) {
 }
 
 /* -------------------------------------------------
-   Student Tracking Log
+   Student Meal Tracking Log
    ------------------------------------------------- */
-function StudentTrackingLog() {
-  const students = [
-    {
-      name: 'Aarav Patel',
-      class: 'Kindergarten',
-      avatar: 'boy',
-      date: '12 Oct 2025',
-      meal: 'Lunch',
-      notes: 'Skipped due to allergy risk',
-      status: 'risk',
-      action: 'Notify Parent',
-    },
-    {
-      name: 'Sara Khan',
-      class: 'LKG',
-      avatar: 'girl',
-      date: '12 Oct 2025',
-      meal: 'Breakfast',
-      notes: 'Ate 80%',
-      status: 'healthy',
-      action: 'Mark Follow-up',
-    },
-    {
-      name: 'Rohan Das',
-      class: 'UKG',
-      avatar: 'boy',
-      date: '12 Oct 2025',
-      meal: 'Snack',
-      notes: 'Requested extra milk',
-      status: 'review',
-      action: 'Add Note',
-    },
-  ];
+function StudentMealTrackingLog({ students, classes, loading }) {
+  const [activeTab, setActiveTab] = useState('All Students');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const getStatusStyle = status =>
-    status === 'risk'
-      ? 'bg-red-100 text-red-800'
-      : status === 'healthy'
-        ? 'bg-green-100 text-green-800'
-        : 'bg-yellow-100 text-yellow-800';
+  const tabs = useMemo(() => {
+    if (!classes) return ['All Students'];
+    return ['All Students', ...classes.map(c => c.classname)];
+  }, [classes]);
+
+  const filteredStudents = useMemo(() => {
+    if (!students) return [];
+    
+    return students.filter(s => {
+      const matchesTab = activeTab === 'All Students' || s.classe?.classname === activeTab;
+      const matchesSearch = s.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           (s.allergies && s.allergies.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchesTab && matchesSearch;
+    });
+  }, [students, activeTab, searchQuery]);
+
+  const getStatusInfo = (student) => {
+    if (student.allergies) return { label: 'Risk', color: 'bg-red-100 text-red-700 border-red-200', note: `Skipped due to ${student.allergies}` };
+    if (student.special_needs) return { label: 'Review', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', note: 'Ate 70% - Monitor behavior' };
+    return { label: 'Healthy', color: 'bg-green-100 text-green-700 border-green-200', note: 'Ate 100% - Finished all' };
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 p-20 flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+        <p className="text-gray-400 font-medium italic">Preparing student tracking log...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Student Meal Tracking Log</h3>
-        <div className="flex gap-2 mt-3">
-          {['All Students', 'Kindergarten1', 'Kindergarten2'].map(filter => (
+    <div className="bg-white rounded-2xl shadow-xl shadow-slate-100/50 border border-gray-100 overflow-hidden">
+      {/* Header & Tabs */}
+      <div className="p-6 border-b border-gray-100 bg-white/50 backdrop-blur-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Student Meal Tracking Log</h2>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Daily monitoring of student nutritional intake and safety.</p>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Search students..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all w-full md:w-64"
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {tabs.map(tab => (
             <button
-              key={filter}
-              className={`px-4 py-2 text-sm rounded-md font-medium ${filter === 'All Students'
-                ? 'bg-slate-800 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                }`}
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 whitespace-nowrap ${
+                activeTab === tab 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 translate-y-[-1px]' 
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+              }`}
             >
-              {filter}
+              {tab}
             </button>
           ))}
         </div>
       </div>
 
+      {/* Table Content */}
       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              {['Student', 'Date', 'Meal', 'Notes', 'Status', 'Actions'].map(h => (
-                <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {h}
-                </th>
-              ))}
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-gray-50/50">
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Student</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Date</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Meal</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Notes</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
-            {students.map((student, idx) => (
-              <tr key={idx} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xl">
-                      {student.avatar}
+          <tbody className="divide-y divide-gray-100">
+            {filteredStudents.length > 0 ? filteredStudents.map((student) => {
+              const status = getStatusInfo(student);
+              return (
+                <motion.tr 
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  key={student.id} 
+                  className="hover:bg-blue-50/30 transition-colors group"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg border-2 transition-transform group-hover:scale-105 ${
+                        student.gender === 'Female' ? 'bg-pink-50 text-pink-600 border-pink-100' : 'bg-blue-50 text-blue-600 border-blue-100'
+                      }`}>
+                        {student.image ? (
+                           <img src={student.image} alt="" className="w-full h-full object-cover rounded-full" />
+                        ) : (
+                           student.fullname.charAt(0)
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{student.fullname}</div>
+                        <div className="text-xs text-gray-500 font-medium">{student.classe?.classname} {student.section && `• ${student.section}`}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                      <div className="text-sm text-gray-500">{student.class}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-semibold text-gray-700">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold">
+                      <Utensils size={12} />
+                      Lunch
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <p className="text-sm text-gray-600 max-w-xs leading-relaxed font-medium">
+                        {status.note}
+                    </p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border-2 ${status.color}`}>
+                      <div className={`w-2 h-2 rounded-full animate-pulse ${status.label === 'Risk' ? 'bg-red-500' : status.label === 'Healthy' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                      {status.label}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-center gap-2">
+                      <button title="Notify Parent" className="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm">
+                        <Bell size={18} />
+                      </button>
+                      <button title="Mark Follow-up" className="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-all shadow-sm">
+                        <CheckCircle size={18} />
+                      </button>
+                      <button title="Add Note" className="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm">
+                        <Notebook size={18} />
+                      </button>
                     </div>
+                  </td>
+                </motion.tr>
+              );
+            }) : (
+              <tr>
+                <td colSpan="6" className="px-6 py-20 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-2">
+                       <Search className="text-gray-200" size={32} />
+                    </div>
+                    <p className="text-gray-400 font-medium italic">No students found matching your filters.</p>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.date}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.meal}</td>
-                <td className="px-6 py-4 text-sm text-gray-900">{student.notes}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(student.status)}`}>
-                    {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    className={`px-4 py-2 text-sm font-medium rounded-md ${student.status === 'risk'
-                      ? 'bg-slate-800 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                  >
-                    {student.action}
-                  </button>
-                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -211,19 +267,41 @@ function StudentTrackingLog() {
 /* -------------------------------------------------
    Warnings & Suggestions (right column)
    ------------------------------------------------- */
-function WarningsAndSuggestions() {
+function WarningsAndSuggestions({ students }) {
+  const allergyList = useMemo(() => {
+    if (!students) return [];
+    return students.filter(s => s.allergies).map(s => ({
+        name: s.fullname,
+        issue: s.allergies
+    }));
+  }, [students]);
+
   return (
     <motion.div variants={cardAnimationVariants} className="space-y-6">
       {/* Warnings */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Health & Allergy Warnings</h3>
-        <div className="space-y-3">
-          <div className="bg-red-500 text-white rounded-lg p-4 text-sm">
-            Contains peanuts — not suitable for Aarav.
-          </div>
-          <div className="bg-yellow-500 text-gray-900 rounded-lg p-4 text-sm">
-            Too sugary for Sara — consider alternative
-          </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <BriefcaseMedical className="text-red-500 w-5 h-5" />
+            Critical Health Warnings
+        </h3>
+        <div className="space-y-3 max-h-[300px] overflow-auto pr-2 custom-scrollbar">
+          {allergyList.length > 0 ? allergyList.map((item, idx) => (
+            <div key={idx} className="bg-red-50 border-l-4 border-red-500 p-4 text-sm">
+              <span className="font-bold text-red-800">{item.name}:</span>
+              <p className="text-red-700 mt-1">{item.issue}</p>
+            </div>
+          )) : (
+            <div className="bg-green-50 border-l-4 border-green-500 p-4 text-sm text-green-700">
+                No critical allergies reported in current records.
+            </div>
+          )}
+          
+          {students?.filter(s => s.special_needs).map((s, idx) => (
+             <div key={`sn-${idx}`} className="bg-amber-50 border-l-4 border-amber-500 p-4 text-sm text-amber-800">
+                <span className="font-bold">{s.fullname} (Special Needs):</span>
+                <p className="mt-1">{s.special_needs}</p>
+             </div>
+          ))}
         </div>
       </div>
     </motion.div>
@@ -261,13 +339,16 @@ function QuickActions() {
 export default function App() {
   const [showForm, setShowForm] = useState(false);
   const [mealData, setMealData] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingStudents, setLoadingStudents] = useState(true);
+  const [loadingClasses, setLoadingClasses] = useState(true);
 
   const fetchMealPlan = async () => {
     try {
       setLoading(true);
       const response = await axios.get('/meal-plans');
-      console.log('Meal plan API data:', response.data);
       setMealData(response.data || []);
     } catch (error) {
       console.error('Error fetching meal plan:', error);
@@ -276,8 +357,34 @@ export default function App() {
     }
   };
 
+  const fetchStudents = async () => {
+    try {
+      setLoadingStudents(true);
+      const response = await axios.get('/students');
+      setStudents(response.data || []);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  const fetchClasses = async () => {
+    try {
+      setLoadingClasses(true);
+      const response = await axios.get('/classes');
+      setClasses(response.data || []);
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+    } finally {
+      setLoadingClasses(false);
+    }
+  };
+
   useEffect(() => {
     fetchMealPlan();
+    fetchStudents();
+    fetchClasses();
   }, []);
 
   return (
@@ -314,13 +421,17 @@ export default function App() {
 
           {/* RIGHT COLUMN – 1/3 */}
           <div>
-            <WarningsAndSuggestions />
+            <WarningsAndSuggestions students={students} />
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
           <div className="lg:col-span-3">
-            <StudentTrackingLog />
+            <StudentMealTrackingLog 
+               students={students} 
+               classes={classes}
+               loading={loadingStudents || loadingClasses} 
+            />
           </div>
           <div>
             <QuickActions />
