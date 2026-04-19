@@ -8,6 +8,9 @@ const AddTeacher = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
+    password: '',
+    contactNumber: '',
     subject: '',
     class: '',
     room: '',
@@ -15,7 +18,6 @@ const AddTeacher = () => {
     status: 'Active',
     image: '',
     email: '',
-    phone: '',
     joinedDate: '',
     qualifications: '',
     bio: '',
@@ -50,8 +52,8 @@ const AddTeacher = () => {
 
     // Reset form
     setFormData({
-      name: '', subject: '', class: '', room: '', experience: '',
-      status: 'Active', image: '', email: '', phone: '', joinedDate: '',
+      name: '', username: '', password: '', contactNumber: '', subject: '', class: '', room: '', experience: '',
+      status: 'Active', image: '', email: '', joinedDate: '',
       qualifications: '', bio: ''
     });
     setPreviewImage(null);
@@ -79,20 +81,20 @@ const AddTeacher = () => {
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             {/* Rest of your form — unchanged but cleaned */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name, Subject, Class, Room, Experience, Status */}
-              {['name', 'subject', 'class', 'room', 'experience'].map((field) => (
+              {/* Name, Username, Password, Subject, Class, Room, Experience, Status */}
+              {['name', 'username', 'password', 'subject', 'class', 'room', 'experience'].map((field) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-gray-700 mb-2 capitalize">
-                    {field === 'class' ? 'Assigned Class' : field}
+                    {field === 'class' ? 'Assigned Class' : field === 'contactNumber' ? 'Contact Number' : field}
                   </label>
                   <input
-                    type="text"
+                    type={field === 'password' ? 'password' : 'text'}
                     name={field}
                     value={formData[field]}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                    placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                    placeholder={field === 'contactNumber' ? 'Contact Number' : field.charAt(0).toUpperCase() + field.slice(1)}
                   />
                 </div>
               ))}
@@ -124,11 +126,11 @@ const AddTeacher = () => {
                 )}
               </div>
 
-              {/* Email, Phone, Joined Date, Qualifications */}
-              {['email', 'phone', 'joinedDate', 'qualifications'].map((field) => (
+              {/* Email, Contact Number, Joined Date, Qualifications */}
+              {['email', 'contactNumber', 'joinedDate', 'qualifications'].map((field) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {field === 'joinedDate' ? 'Joined Date' : field.charAt(0).toUpperCase() + field.slice(1)}
+                    {field === 'joinedDate' ? 'Joined Date' : field === 'contactNumber' ? 'Contact Number' : field.charAt(0).toUpperCase() + field.slice(1)}
                   </label>
                   <input
                     type={field === 'email' ? 'email' : field === 'joinedDate' ? 'date' : 'text'}
@@ -137,6 +139,7 @@ const AddTeacher = () => {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder={field === 'contactNumber' ? 'Contact Number' : field === 'joinedDate' ? '' : field.charAt(0).toUpperCase() + field.slice(1)}
                   />
                 </div>
               ))}
@@ -184,8 +187,10 @@ const AddTeacher = () => {
                   />
                   <div>
                     <h3 className="text-2xl font-bold">{formData.name}</h3>
+                    <p className="text-sm font-medium text-gray-700">@{formData.username}</p>
                     <p className="text-lg text-gray-600">{formData.subject} Teacher</p>
                     <p className="text-sm text-gray-500 mt-2">{formData.email}</p>
+                    <p className="text-sm text-gray-500">{formData.contactNumber}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
