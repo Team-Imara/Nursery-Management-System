@@ -148,6 +148,8 @@ Route::middleware(['auth:api', 'tenancy'])->group(function () {
     Route::delete('student-meals/{id}', [StudentMealController::class, 'destroy']);
 
     // Teacher Attendances
+    Route::get('teacher-attendances/get-weekly-summary', [TeacherAttendanceController::class, 'getWeeklySummary']);
+    Route::post('teacher-attendances/bulk-store', [TeacherAttendanceController::class, 'bulkStore']);
     Route::get('teacher-attendances', [TeacherAttendanceController::class, 'index']); // With ?teacherId=
     Route::post('teacher-attendances', [TeacherAttendanceController::class, 'store']);
     Route::get('teacher-attendances/{id}', [TeacherAttendanceController::class, 'show']);

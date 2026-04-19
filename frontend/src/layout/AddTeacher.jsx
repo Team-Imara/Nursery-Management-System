@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Layout from '../components/Layout.jsx';
+import axios from '../api/axios.js';
 
 const AddTeacher = () => {
   const navigate = useNavigate();
@@ -46,18 +47,72 @@ const AddTeacher = () => {
 
   const handlePreview = () => setShowPreview(true);
 
-  const handleSubmit = (e) => {
+  // ✅ FINAL FIXED SUBMIT
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/teachers', { state: { newTeacher: formData } });
 
-    // Reset form
-    setFormData({
-      name: '', username: '', password: '', contactNumber: '', subject: '', class: '', room: '', experience: '',
-      status: 'Active', image: '', email: '', joinedDate: '',
-      qualifications: '', bio: ''
-    });
-    setPreviewImage(null);
-    setShowPreview(false);
+    // 🔴 Prevent 422 (required fields)
+    if (!formData.name || !formData.email || !formData.username || !formData.password) {
+      alert("Please fill all required fields (Name, Email, Username, Password)");
+      return;
+    }
+
+    try {
+      const payload = {
+        fullname: formData.name,
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        phone: formData.contactNumber,
+        teaching_subject: formData.subject,
+        assigned_class_text: formData.class,
+        room_text: formData.room,
+        experience: formData.experience,
+        status: formData.status,
+        profile_photo: formData.image,
+        join_date: formData.joinedDate,
+        qualification: formData.qualifications,
+        bio: formData.bio,
+        role: "teacher"
+      };
+
+      const response = await axios.post('/users', payload);
+
+      console.log("SUCCESS:", response.data);
+      alert("Teacher created successfully!");
+
+      navigate('/teachers');
+
+      // reset form
+      setFormData({
+        name: '',
+        username: '',
+        password: '',
+        contactNumber: '',
+        subject: '',
+        class: '',
+        room: '',
+        experience: '',
+        status: 'Active',
+        image: '',
+        email: '',
+        joinedDate: '',
+        qualifications: '',
+        bio: '',
+      });
+
+      setPreviewImage(null);
+      setShowPreview(false);
+
+    } catch (error) {
+      console.log("FULL ERROR:", error.response);
+
+      if (error.response?.status === 422) {
+        alert("Validation Error:\n" + JSON.stringify(error.response.data.errors, null, 2));
+      } else {
+        alert("Server error. Check backend.");
+      }
+    }
   };
 
   const headerContent = (
@@ -79,13 +134,13 @@ const AddTeacher = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Add New Teacher</h1>
 
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            {/* Rest of your form — unchanged but cleaned */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name, Username, Password, Subject, Class, Room, Experience, Status */}
+
               {['name', 'username', 'password', 'subject', 'class', 'room', 'experience'].map((field) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-gray-700 mb-2 capitalize">
-                    {field === 'class' ? 'Assigned Class' : field === 'contactNumber' ? 'Contact Number' : field}
+                    {field === 'class' ? 'Assigned Class' : field}
                   </label>
                   <input
                     type={field === 'password' ? 'password' : 'text'}
@@ -93,119 +148,90 @@ const AddTeacher = () => {
                     value={formData[field]}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                    placeholder={field === 'contactNumber' ? 'Contact Number' : field.charAt(0).toUpperCase() + field.slice(1)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
               ))}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                >
+                <label>Status</label>
+                <select name="status" value={formData.status} onChange={handleChange} className="w-full p-3 border rounded-xl">
                   <option value="Active">Active</option>
                   <option value="On Leave">On Leave</option>
                 </select>
               </div>
 
-              {/* Image Upload */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Photo</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-                {previewImage && (
-                  <img src={previewImage} alt="Preview" className="mt-4 w-32 h-32 object-cover rounded-xl shadow-md" />
-                )}
+                <label>Photo</label>
+                <input type="file" accept="image/*" onChange={handleImageUpload} />
+                {previewImage && <img src={previewImage} className="mt-2 w-24 h-24 rounded-full" />}
               </div>
 
-              {/* Email, Contact Number, Joined Date, Qualifications */}
               {['email', 'contactNumber', 'joinedDate', 'qualifications'].map((field) => (
                 <div key={field}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {field === 'joinedDate' ? 'Joined Date' : field === 'contactNumber' ? 'Contact Number' : field.charAt(0).toUpperCase() + field.slice(1)}
-                  </label>
+                  <label>{field}</label>
                   <input
                     type={field === 'email' ? 'email' : field === 'joinedDate' ? 'date' : 'text'}
                     name={field}
                     value={formData[field]}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder={field === 'contactNumber' ? 'Contact Number' : field === 'joinedDate' ? '' : field.charAt(0).toUpperCase() + field.slice(1)}
+                    className="w-full p-3 border rounded-xl"
                   />
                 </div>
               ))}
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleChange}
-                  rows={4}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                />
+                <label>Bio</label>
+                <textarea name="bio" value={formData.bio} onChange={handleChange} className="w-full p-3 border rounded-xl" />
               </div>
             </div>
 
-            <div className="flex gap-4 mt-8">
-              <button
-                type="button"
-                onClick={handlePreview}
-                className="flex-1 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition shadow-lg"
-              >
+            <div className="flex gap-4 mt-6">
+              <button type="button" onClick={handlePreview} className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
                 Preview
               </button>
-              <button
-                type="submit"
-                className="flex-1 py-4 bg-gradient-to-r from-slate-800 to-slate-900 text-white font-semibold rounded-xl hover:from-slate-900 hover:to-black transition shadow-lg"
-              >
+              <button type="submit" className="w-full px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium flex items-center justify-center gap-2">
                 Create Teacher
               </button>
             </div>
           </form>
 
-          {/* Preview Modal */}
+          {/* Preview */}
           {showPreview && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-2xl max-w-2xl w-full max-h-screen overflow-y-auto p-8">
-                <h2 className="text-2xl font-bold mb-6">Teacher Preview</h2>
-                <div className="flex gap-6 mb-6">
+            <div className="mt-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Preview</h2>
+              <div className="flex items-start gap-6 mb-6">
+                <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0">
                   <img
-                    src={previewImage || 'https://via.placeholder.com/150'}
-                    alt="Teacher"
-                    className="w-32 h-32 rounded-full object-cover shadow-lg"
+                    src={previewImage || formData.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name || 'Teacher')}&background=random`}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
                   />
-                  <div>
-                    <h3 className="text-2xl font-bold">{formData.name}</h3>
-                    <p className="text-sm font-medium text-gray-700">@{formData.username}</p>
-                    <p className="text-lg text-gray-600">{formData.subject} Teacher</p>
-                    <p className="text-sm text-gray-500 mt-2">{formData.email}</p>
-                    <p className="text-sm text-gray-500">{formData.contactNumber}</p>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                    {formData.name || 'Teacher Name'}
+                  </h3>
+                  <p className="text-lg text-gray-600 mb-3">
+                    {formData.subject || 'Subject'} Teacher
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1 text-sm text-gray-600">
+                      <span>Class / Room: {formData.class || 'N/A'} - {formData.room || 'N/A'}</span>
+                      <span>Contact: {formData.contactNumber || 'N/A'}</span>
+                      <span>Email: {formData.email || 'N/A'}</span>
+                    </div>
+                    <span
+                      className={`text-sm font-medium px-3 py-1 rounded-full ${formData.status === 'Active' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}
+                    >
+                      {formData.status || 'Active'}
+                    </span>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div><strong>Class:</strong> {formData.class}</div>
-                  <div><strong>Room:</strong> {formData.room}</div>
-                  <div><strong>Experience:</strong> {formData.experience}</div>
-                  <div><strong>Status:</strong> <span className={`px-3 py-1 rounded-full text-xs font-medium ${formData.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>{formData.status}</span></div>
-                </div>
-                <p className="mt-4 text-gray-700"><strong>Bio:</strong> {formData.bio}</p>
-                <button
-                  onClick={() => setShowPreview(false)}
-                  className="mt-6 w-full py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-medium"
-                >
-                  Close Preview
-                </button>
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600">
+                  <strong>Bio:</strong> {formData.bio || 'No bio provided.'}
               </div>
             </div>
           )}

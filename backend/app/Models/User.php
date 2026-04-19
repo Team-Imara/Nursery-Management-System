@@ -15,11 +15,23 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, BelongsToTenant;
 
-    protected $fillable = [
-        'fullname', 'username', 'dob', 'email', 'password', 'role', 'phone', 'address', 'nic',
-        'emergency_contact_name', 'emergency_contact_phone', 'teaching_subject',
-        'basic_salary', 'join_date', 'qualification', 'experience', 'profile_photo', 'tenant_id'
-    ];
+   protected $fillable = [
+    'fullname',
+    'email',
+    'username',
+    'password',
+    'role',
+    'phone',
+    'teaching_subject',
+    'assigned_class_text',
+    'room_text',
+    'experience',
+    'status',
+    'profile_photo',
+    'join_date',
+    'qualification',
+    'bio'
+];
 
     protected $hidden = ['password', 'remember_token'];
 
