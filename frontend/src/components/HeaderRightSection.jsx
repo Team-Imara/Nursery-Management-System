@@ -12,7 +12,7 @@ const HeaderRightSection = ({ notificationCount = 0, onNotificationClick }) => {
 
   const profile = {
     full_name: settings.admin.fullname,
-    avatar_url: settings.admin.profile_photo_url || 'https://via.placeholder.com/40?text=U'
+    avatar_url: settings.admin.profile_photo_url || `https://ui-avatars.com/api/?name=${settings.admin.fullname}&background=random`
   };
 
   const toggleDropdown = () => setIsDropdownOpen((v) => !v);

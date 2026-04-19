@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageCircle, Edit2, X, Save, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout.jsx';
+import axios from '../api/axios.js';
 
 const TeacherDetail = () => {
   const navigate = useNavigate();
@@ -53,15 +54,60 @@ const TeacherDetail = () => {
     animate: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100, damping: 10 } },
   };
 
-  const handleSave = () => {
-    const savedTeachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-    const updatedTeachers = savedTeachers.map(t =>
-      t.id === teacher.id ? { ...t, ...editedTeacher } : t
-    );
-    localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
-    setTeacher(editedTeacher);
-    setIsEditing(false);
-    window.dispatchEvent(new CustomEvent('teachers-updated'));
+  const handleSave = async () => {
+    try {
+      const payload = {
+        fullname: editedTeacher.name,
+        email: editedTeacher.email,
+        phone: editedTeacher.phone,
+        teaching_subject: editedTeacher.subject,
+        assigned_class_text: editedTeacher.class,
+        room_text: editedTeacher.room,
+        experience: editedTeacher.experience,
+        status: editedTeacher.status,
+        profile_photo: editedTeacher.image,
+        join_date: editedTeacher.joinedDate,
+        qualification: editedTeacher.qualifications,
+        bio: editedTeacher.bio,
+      };
+
+      const response = await axios.put(`/users/${teacher.id}`, payload);
+      const user = response.data;
+      
+      const updatedTeacherObj = {
+        id: user.id,
+        name: user.fullname,
+        subject: user.teaching_subject || 'N/A',
+        class: user.assigned_class_text || 'N/A',
+        room: user.room_text || 'N/A',
+        experience: user.experience ? `${user.experience}` : 'N/A',
+        email: user.email,
+        phone: user.phone || 'N/A',
+        status: user.status || 'Active',
+        image: user.profile_photo || user.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullname)}&background=random`,
+        joinedDate: user.join_date || 'N/A',
+        qualifications: user.qualification || 'N/A',
+        bio: user.bio || 'No bio available.',
+        raw: user
+      };
+
+      setTeacher(updatedTeacherObj);
+      setEditedTeacher(updatedTeacherObj);
+      setIsEditing(false);
+      
+      // Update local cache if any
+      const savedTeachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+      const updatedTeachers = savedTeachers.map(t =>
+        t.id === user.id ? updatedTeacherObj : t
+      );
+      localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
+
+      window.dispatchEvent(new CustomEvent('teachers-updated'));
+      alert("Teacher updated successfully!");
+    } catch (error) {
+      console.error("Error updating teacher:", error);
+      alert("Failed to update teacher");
+    }
   };
 
   const handleCancel = () => {
@@ -69,12 +115,24 @@ const TeacherDetail = () => {
     setIsEditing(false);
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (window.confirm(`Remove ${teacher.name}?`)) {
-      const savedTeachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-      const updatedTeachers = savedTeachers.filter(t => t.id !== teacher.id);
-      localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
-      navigate('/teachers', { replace: true });
+      try {
+        if (teacher.id) {
+          await axios.delete(`/users/${teacher.id}`);
+        }
+        
+        // Update local cache
+        const savedTeachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+        const updatedTeachers = savedTeachers.filter(t => t.id !== teacher.id);
+        localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
+        
+        alert("Teacher removed successfully");
+        navigate('/teachers', { replace: true });
+      } catch (error) {
+        console.error("Error removing teacher:", error);
+        alert("Failed to remove teacher");
+      }
     }
   };
 
