@@ -1,2 +1,2 @@
 # Nursery-Management-System
-Nursery Management System – A web-based application designed to manage student details, classes, behavior reports, and study materials in a nursery school. Built using Laravel and React for efficient performance and an easy-to-use interface.
+A multitenant web-based application built with Laravel 11, React (Vite), and MySQL for managing nursery school operations. The system supports student and teacher management, attendance, health records, behavior tracking, meal planning, event management, dashboards, reporting, and parent notifications while ensuring secure tenant-based data isolation using the Stancl Tenancy package.
